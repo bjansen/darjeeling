@@ -1,0 +1,13 @@
+
+[defaults]
+encoding=UTF-8
+
+[repositories]
+remote=aether:/Users/bastien/.m2/settings.xml
+
+[compiler]
+source=source
+source=gen-src
+
+[formattool]
+profile=default
