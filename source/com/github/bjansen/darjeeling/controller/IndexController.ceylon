@@ -7,7 +7,8 @@ import com.github.bjansen.darjeeling {
 	darjeelingDS
 }
 import com.github.bjansen.darjeeling.model {
-	Feed
+	Feed,
+	Item
 }
 import com.github.bjansen.gyokuro {
 	route,
@@ -17,6 +18,9 @@ import com.github.bjansen.gyokuro {
 import gen.com.github.bjansen.darjeeling.tables {
 	Feeds {
 		feeds=\iFEEDS
+	},
+	Items {
+		items = \iITEMS
 	}
 }
 
@@ -25,6 +29,9 @@ import org.jooq {
 }
 import org.jooq.impl {
 	DSL
+}
+import java.lang {
+	JInteger = Integer
 }
 
 route ("feeds")
@@ -35,5 +42,12 @@ controller class FeedController() {
 		value feedzee = DSL.using(darjeelingDS, SQLDialect.\iMYSQL);
 
 		return CeylonList(feedzee.select().from(feeds).fetch().into(javaClass<Feed>())).sequence();
+	}
+	
+	route("items")
+	shared Item[] listItems(Integer feedId) {
+		value feedzee = DSL.using(darjeelingDS, SQLDialect.\iMYSQL);
+
+		return CeylonList(feedzee.select().from(items).where(items.\iFEED_ID.eq(JInteger(feedId))).limit(10).fetch().into(javaClass<Item>())).sequence();
 	}
 }
