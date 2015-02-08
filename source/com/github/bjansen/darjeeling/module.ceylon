@@ -9,6 +9,7 @@ module com.github.bjansen.darjeeling "0.1" {
 	
 	import ceylon.net "1.1.1";
 	import ceylon.time "1.1.1";
+	import ceylon.logging "1.1.1";
 	
 	import gen.com.github.bjansen.darjeeling "0.1";
 	import com.github.bjansen.gyokuro "0.1";
