@@ -1,6 +1,10 @@
 
 [defaults]
 encoding=UTF-8
+offline=true
+flatclasspath=false
+autoexportmavendependencies=false
+overrides=overrides.xml
 
 [repositories]
 remote=aether:/Users/bastien/.m2/settings.xml
@@ -8,6 +12,7 @@ remote=aether:/Users/bastien/.m2/settings.xml
 [compiler]
 source=source
 source=gen-src
+resource=resource
 
 [formattool]
 profile=default

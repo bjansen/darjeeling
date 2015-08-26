@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.5.0.xsd">
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.6.0.xsd">
   <!-- Configure the database connection here -->
   <jdbc>
     <driver>com.mysql.jdbc.Driver</driver>
@@ -11,8 +11,12 @@
   <generator>
     <!-- The default code generator. You can override this one, to generate your own code style
          Defaults to org.jooq.util.DefaultGenerator -->
-    <name>gen.com.github.bjansen.darjeeling.jooq.CeylonGenerator</name>
+    <name>org.jooq.util.DefaultGenerator</name>
 
+    <strategy>
+        <name>com.github.bjansen.ceylon.jooqadapter.CeylonNamingStrategy</name>
+    </strategy>
+    
     <database>
       <!-- The database type. The format here is:
            org.util.[database].[database]Database -->
@@ -36,8 +40,18 @@
       	<customType>
 			<name>DateTime</name>
 			<type>ceylon.time.DateTime</type>
-			<converter>gen.com.github.bjansen.darjeeling.jooq.DateTimeConverter</converter>
+			<converter>com.github.bjansen.ceylon.jooqadapter.DateTimeConverter</converter>
       	</customType>
+        <customType>
+            <name>String</name>
+            <type>ceylon.language.String</type>
+            <converter>com.github.bjansen.ceylon.jooqadapter.StringConverter</converter>
+        </customType>
+        <customType>
+            <name>Integer</name>
+            <type>ceylon.language.Integer</type>
+            <converter>com.github.bjansen.ceylon.jooqadapter.IntegerConverter</converter>
+        </customType>
       </customTypes>
       
       <forcedTypes>
@@ -45,6 +59,14 @@
       		<name>DateTime</name>
       		<types>datetime</types>
       	</forcedType>
+        <forcedType>
+            <name>Integer</name>
+            <types>(integer|int)</types>
+        </forcedType>
+        <forcedType>
+            <name>String</name>
+            <types>varchar</types>
+        </forcedType>
       </forcedTypes>
     </database>
 

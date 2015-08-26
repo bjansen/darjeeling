@@ -1,0 +1,5 @@
+<overrides xmlns="http://www.ceylon-lang.org/xsd/overrides">
+     <module module="org.modelmapper.extensions:modelmapper-jooq">
+        <add module="org.jooq:jooq" shared="true" version="3.7.0-SNAPSHOT"/>
+     </module>
+</overrides>

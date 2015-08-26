@@ -1,7 +1,7 @@
 import com.github.bjansen.darjeeling.model {
-	Feed,
 	Item,
-	Folder
+	Folder,
+    Feed
 }
 import com.github.bjansen.gyokuro {
 	route,
@@ -18,12 +18,17 @@ class FeedController() {
 	value feedsDao = FeedsDao();
 	
 	route ("all")
-	shared Folder[] listAll() {
+	shared <Feed|Folder>[] listAll() {
 		return feedsDao.listFoldersAndFeeds();
 	}
 	
 	route ("items")
 	shared Item[] listItems(Integer feedId) {
 		return feedsDao.listItemsByFeed(feedId);
+	}
+	
+	route ("subscribe")
+	shared Feed subscribe(String url, String title, Integer? folderId) {
+		return feedsDao.subscribe(url, title, folderId);
 	}
 }

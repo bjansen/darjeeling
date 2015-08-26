@@ -6,3 +6,37 @@ html, body, .container-fluid, .row {
 	height: 100%;
 	overflow: auto;
 }
+
+.feeds {
+	padding-left: 0;
+}
+
+.feeds h1 {
+	padding-left: 15px;
+}
+
+.feeds ul {
+	margin: 0;
+	padding: 5px 0;
+}
+
+.feeds li {
+	list-style-type: none;
+}
+
+.feeds a {
+	text-decoration: none;
+}
+
+.feeds h3 {
+	font-size: 1.1em;
+	padding-left: 15px;
+}
+
+.folder ul li {
+	padding-left: 35px;
+}
+
+.feeds > ul > li.feed {
+	padding-left: 20px;
+}
