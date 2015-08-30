@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Items extends TableImpl<ItemsRecord> {
 
-	private static final long serialVersionUID = 872588686;
+	private static final long serialVersionUID = -765865434;
 
 	/**
 	 * The reference instance of <code>feedzee2.items</code>
@@ -75,7 +75,7 @@ public class Items extends TableImpl<ItemsRecord> {
 	/**
 	 * The column <code>feedzee2.items.description</code>.
 	 */
-	public final TableField<ItemsRecord, java.lang.String> description = createField("description", org.jooq.impl.SQLDataType.CLOB, this, "");
+	public final TableField<ItemsRecord, String> description = createField("description", org.jooq.impl.SQLDataType.CLOB, this, "", new StringConverter());
 
 	/**
 	 * The column <code>feedzee2.items.publication_date</code>.

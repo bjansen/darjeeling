@@ -1,53 +1,62 @@
 <!doctype html>
 <html lang="en" ng-app="darjeelingApp">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Darjeeling</title>
-  <link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="css/app.css">
-  <script src="vendor/angular/angular.min.js"></script>
-  <script src="vendor/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-  <script src="js/controllers.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>Darjeeling</title>
+	<link rel="stylesheet" href="vendor/angular-material/angular-material.min.css">
+	<link rel="stylesheet" href="css/app.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body ng-controller="FeedsCtrl">
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-md-3 col-xs-12 feeds">
-				<h1>Feeds:</h1>
-				<button type="button" class="btn btn-primary center-block" ng-click="showSubscribePopup()">Subscribe</button>
-				<ul>
-				    <li ng-repeat="folder in folders" class="folder">
-			            <h3>
-			                <span class="glyphicon glyphicon-chevron-right" ng-show="!folder.expanded" ng-click="toggle(folder)"></span>
-			                <span class="glyphicon glyphicon-chevron-down" ng-show="folder.expanded" ng-click="toggle(folder)"></span>
-			                <a href="#">{{folder.name}}</a>
-		                </h3>
-			            <ul ng-show="folder.expanded">
-			                <li ng-repeat="feed in folder.feeds">
-			                    <div><a href="#" ng-click="displayUnreadItems(feed)">{{feed.name}}</a></div>
-			                </li>
-			            </ul>
-				    </li>
-					<li ng-repeat="feed in feeds" class="feed">
-						<div><a href="#" ng-click="displayUnreadItems(feed)">{{feed.name}}</a></div>
-					</li>
-				</ul>
-			</div>
-			
-			<div class="col-md-9 col-xs-12 items">
-				<h1>Items:</h1>
-				<div ng-repeat="item in items">
-					<h2>{{item.title}}</h2>
-					<div>
-						{{item.description}}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
+<body layout="row" ng-controller="FeedsCtrl">
+    <div layout="column" flex>
+        <md-toolbar layout="row">
+        <div class="md-toolbar-tools">
+            <md-button ng-click="toggleSidenav('left')" class="md-icon-button">
+                <md-icon aria-label="Menu" md-svg-src="/images/menu.svg"></md-icon>
+            </md-button>
+            <h1 hide-sm>Darjeeling</h1>
+
+            <span flex></span>
+
+            <md-select name="selectedFeeds" ng-model="selectedFeed" aria-label="Feed to display" style="max-width: 50%"
+                       ng-change="displayUnreadItems(selectedFeed)">
+              <md-option value="-1" selected>All feeds</md-option>
+              <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}}</md-option>
+              <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}}</md-option>
+            </md-select>
+            <md-button>
+                <md-icon ng-click="displayUnreadItems(selectedFeed)">refresh</md-icon>
+            </md-button>
+
+            <span flex></span>
+        </div>
+        </md-toolbar>
+
+        <section layout="row" flex="">
+		    <md-sidenav layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left">
+		        <md-button class="md-primary md-raised">Subscribe</md-button>
+		        <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
+		    </md-sidenav>
+        
+            <md-content layout="column" flex class="md-padding">
+                <md-card ng-repeat="item in items" class="item" ng-init="currentFeed = getCurrentFeed(item)">
+                    <div layout="row" layout-sm="column" layout-align-sm="start start">
+                        <h2 class="md-headline"><a href="{{item.url}}">{{item.title}}</a></h2>
+                        <span flex></span>
+                        <span style="color: #999;">
+                            <md-tooltip>{{item.publicationDate | date : 'medium'}}</md-tooltip>
+                            {{item.publicationDate | prettyDate}}
+                        </span>
+                    </div>
+                    <span class="md-subhead" style="color: #999; margin-bottom: 10px">from {{currentFeed.name}}</span>
+                    <div ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto"></div>
+                </md-card>
+            </md-content>
+        </section>
+    </div>
+
     <script type="text/ng-template" id="subscribePopup.html">
         <div class="modal-header">
             <h3 class="modal-title">Subscribe to new feed</h3>
@@ -70,5 +79,10 @@
         </div>
     </script>
 
+    <script src="vendor/angular/angular.min.js"></script>
+    <script src="vendor/angular-animate/angular-animate.min.js"></script>
+    <script src="vendor/angular-aria/angular-aria.min.js"></script>
+    <script src="vendor/angular-material/angular-material.min.js"></script>
+    <script src="js/controllers.js"></script>
 </body>
 </html>

@@ -23,8 +23,13 @@ class FeedController() {
 	}
 	
 	route ("items")
-	shared Item[] listItems(Integer feedId) {
+	shared Item[] listItems(Integer? feedId) {
 		return feedsDao.listItemsByFeed(feedId);
+	}
+	
+	route ("itemsInFolder")
+	shared Item[] listItemsInFolder(Integer folderId) {
+		return feedsDao.listItemsByFolder(folderId);
 	}
 	
 	route ("subscribe")

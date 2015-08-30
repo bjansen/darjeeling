@@ -7,7 +7,8 @@ import org.jooq.impl {
 import org.jooq {
     SQLDialect,
     RecordMapper,
-    Record
+    Record,
+    Condition
 }
 import com.github.bjansen.darjeeling.model {
     Feed,
@@ -50,25 +51,25 @@ import ceylon.time {
 }
 
 shared class FeedsDao() {
-    value feedzee = DSL.using(darjeelingDS, SQLDialect.\iMYSQL);
+    value db = DSL.using(darjeelingDS, SQLDialect.\iMYSQL);
     value modelMapper = ModelMapper();
     modelMapper.configuration
         .addValueReader(RecordValueReader())
         .setSourceNameTokenizer(NameTokenizers.\iUNDERSCORE);
     
     shared Feed[] listFeeds() {
-        return CeylonList(feedzee.select().from(feeds).fetch().into(javaClass<Feed>())).sequence();
+        return CeylonList(db.select().from(feeds).fetch().into(javaClass<Feed>())).sequence();
     }
     
     shared <Feed|Folder>[] listFoldersAndFeeds() {
-        value folderRecords = feedzee.select()
+        value folderRecords = db.select()
             .from(folders)
             .join(subscriptions).on(subscriptions.folderId.equal(folders.id))
             .join(feeds).on(subscriptions.feedId.equal(feeds.id))
             .fetch()
             .map(FolderRecordMapper());
         
-        value feedsRecords = feedzee.select()
+        value feedsRecords = db.select()
             .from(feeds)
                 .join(subscriptions).on(subscriptions.feedId.equal(feeds.id))
                 .where(subscriptions.folderId.isNull())
@@ -78,38 +79,53 @@ shared class FeedsDao() {
                 .append(CeylonList(feedsRecords).sequence());
     }
     
-    shared Item[] listItemsByFeed(Integer feedId) {
+    // TODO restrict by user
+    shared Item[] listItemsByFeed(Integer? feedId) {
+        {Condition*} condition = if (exists feedId) then {items.feedId.eq(feedId)} else {};
+        
         return CeylonList(
-            feedzee.select()
+            db.select(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId)
                 .from(items)
-                .where(items.feedId.eq(feedId))
+                .where(*condition)
                 .limit(10)
                 .fetch().into(javaClass<Item>())
         ).sequence();
     }
     
+    // TODO restrict by user
+    shared Item[] listItemsByFolder(Integer folderId) {
+        return CeylonList(
+            db.select(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId)
+                    .from(items)
+                    .join(subscriptions).on(subscriptions.feedId.eq(items.feedId))
+                    .where(subscriptions.folderId.eq(folderId))
+                    .limit(10)
+                    .fetch().into(javaClass<Item>())
+        ).sequence();
+    }
+
     shared Feed subscribe(String url, String title, Integer? folderId) {
         Folder? folder = if (exists folderId)
-                         then feedzee.select().from(folders).where(folders.id.eq(folderId)).fetchOneInto(javaClass<Folder>())
+                         then db.select().from(folders).where(folders.id.eq(folderId)).fetchOneInto(javaClass<Folder>())
                          else null;
         
         value adjustedFolderId = folder?.id;
         
-        Feed? persistedFeed = feedzee.selectFrom(feeds).where(feeds.url.eq(url)).fetchOneInto(javaClass<Feed>());
+        Feed? persistedFeed = db.selectFrom(feeds).where(feeds.url.eq(url)).fetchOneInto(javaClass<Feed>());
         
         value _now = now().dateTime();
         Feed feed;
         if (exists persistedFeed) {
             feed = persistedFeed;
         } else {
-            value record = feedzee.insertInto(feeds, feeds.name, feeds.url, feeds.createdAt, feeds.updatedAt)
+            value record = db.insertInto(feeds, feeds.name, feeds.url, feeds.createdAt, feeds.updatedAt)
                                   .values(title, url, _now, _now)
                                   .returning(feeds.id)
                                   .fetchOne();
             feed = record.into(javaClass<Feed>());
         }
         
-        feedzee.insertInto(subscriptions, subscriptions.feedId, subscriptions.folderId, subscriptions.createdAt, subscriptions.updatedAt)
+        db.insertInto(subscriptions, subscriptions.feedId, subscriptions.folderId, subscriptions.createdAt, subscriptions.updatedAt)
                .values(feed.id, adjustedFolderId, _now, _now)
                .execute();
         

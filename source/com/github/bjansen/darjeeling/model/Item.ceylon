@@ -1,5 +1,8 @@
-shared class Item() {
-	shared variable Integer id = 0;
-	shared variable String title = "";
-	shared variable String description = "";
+import ceylon.time {
+    DateTime
+}
+
+shared class Item(shared Integer id, shared String title, shared String description, shared String url,
+	shared DateTime publicationDate, shared Integer feedId) {
+    
 }
