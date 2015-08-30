@@ -14,7 +14,7 @@
         <md-toolbar layout="row">
         <div class="md-toolbar-tools">
             <md-button ng-click="toggleSidenav('left')" class="md-icon-button">
-                <md-icon aria-label="Menu" md-svg-src="/images/menu.svg"></md-icon>
+                <md-icon aria-label="Menu">menu</md-icon>
             </md-button>
             <h1 hide-sm>Darjeeling</h1>
 
@@ -22,25 +22,29 @@
 
             <md-select name="selectedFeeds" ng-model="selectedFeed" aria-label="Feed to display" style="max-width: 50%"
                        ng-change="displayUnreadItems(selectedFeed)">
-              <md-option value="-1" selected>All feeds</md-option>
-              <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}}</md-option>
-              <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}}</md-option>
+                <md-option value="-1" selected>All feeds</md-option>
+                <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}}</md-option>
+                <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}}</md-option>
+                <md-option ng-repeat="feed in feeds" ng-value="feed">{{feed.name}}</md-option>
             </md-select>
+
+            <span flex></span>
             <md-button>
                 <md-icon ng-click="displayUnreadItems(selectedFeed)">refresh</md-icon>
             </md-button>
-
-            <span flex></span>
         </div>
         </md-toolbar>
 
         <section layout="row" flex="">
 		    <md-sidenav layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left">
-		        <md-button class="md-primary md-raised">Subscribe</md-button>
+		        <md-button class="md-primary md-raised" ng-click="showSubscribePopup($event)">Subscribe</md-button>
 		        <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
 		    </md-sidenav>
-        
+
             <md-content layout="column" flex class="md-padding">
+                <md-card ng-if="items.length === 0">
+                    No item to display!
+                </md-card>
                 <md-card ng-repeat="item in items" class="item" ng-init="currentFeed = getCurrentFeed(item)">
                     <div layout="row" layout-sm="column" layout-align-sm="start start">
                         <h2 class="md-headline"><a href="{{item.url}}">{{item.title}}</a></h2>
@@ -58,25 +62,40 @@
     </div>
 
     <script type="text/ng-template" id="subscribePopup.html">
-        <div class="modal-header">
-            <h3 class="modal-title">Subscribe to new feed</h3>
-        </div>
-        <div class="modal-body">
-            <form>
-                <div class="form-group">
-                    <label for="url">Feed URL</label>
-                    <input type="text" class="form-control" ng-model="url" placeholder="Enter URL here">
-                </div>
-                <div class="form-group">
-                    <label for="name">Feed name</label>
-                    <input type="text" class="form-control" ng-model="name" placeholder="Enter name here">
+        <md-dialog aria-label="Subscribe to new feed">
+            <form name="subscribeForm">
+                <md-toolbar>
+                    <div class="md-toolbar-tools">
+                        <h2>Subscribe to new feed</h2>
+                        <span flex></span>
+                        <md-button class="md-icon-button" ng-click="cancel()">
+                            <md-icon aria-label="Close dialog">close</md-icon>
+                        </md-button>
+                    </div>
+                </md-toolbar>
+                <md-dialog-content style="max-width:800px;max-height:810px; ">
+                    <md-input-container>
+                        <md-icon>folder</md-icon>
+                        <md-select ng-model="folder" placeholder="Parent folder" style="margin-left: 36px;">
+                            <md-option ng-repeat="folder in folders" ng-value="folder">{{folder.name}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container>
+                        <md-icon>link</md-icon>
+                        <input ng-model="url" placeholder="Feed URL" ng-required="true">
+                    </md-input-container>
+                    <md-input-container>
+                        <md-icon>create</md-icon>
+                        <input ng-model="name" placeholder="Feed name" ng-required="true">
+                    </md-input-container>
+                </md-dialog-content>
+                <div class="md-actions" layout="row">
+                    <span flex></span>
+                    <md-button ng-click="subscribe(subscribeForm)" >OK</md-button>
+                    <md-button ng-click="cancel()">Cancel</md-button>
                 </div>
             </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-        </div>
+        </md-dialog>
     </script>
 
     <script src="vendor/angular/angular.min.js"></script>

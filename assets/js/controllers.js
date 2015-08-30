@@ -21,10 +21,9 @@ darjeelingApp.directive('href', function () {
     };
 });
 
-darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav) {
+darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDialog) {
 
     setupHttp($http);
-    var feedsById = {};
 
     var updateFeeds = function () {
         $http.get('/rest/feeds/all').success(function (data) {
@@ -77,26 +76,28 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav) {
         $mdSidenav(menuId).toggle();
     };
 
-    $scope.showSubscribePopup = function () {
-        var modalInstance = $modal.open({
+    $scope.showSubscribePopup = function (ev) {
+        $mdDialog.show({
+            controller: SubscriptionController,
             templateUrl: 'subscribePopup.html',
-            controller: 'SubscriptionsCtrl',
-            resolve: {}
-        });
-
-        modalInstance.result.then(function (result) {
-            $http.post('/rest/feeds/subscribe', {title: result.name, url: result.url})
-                .then(function (response) {
-                    console.log("ok");
-                    console.log(response);
-                    updateFeeds();
-                }, function (response) {
-                    console.log("ko");
-                });
-        });
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true,
+            locals: {
+                folders: $scope.folders
+            }
+        }).then(function (result) {
+                $http.post('/rest/feeds/subscribe', {title: result.name, url: result.url, folderId: result.folderId})
+                    .then(function () {
+                        updateFeeds();
+                    }, function () {
+                        console.log("ko");
+                    });
+            }
+        );
     };
 
-    $scope.getCurrentFeed = function(item) {
+    $scope.getCurrentFeed = function (item) {
 
         for (var i = 0; i < $scope.folders.length; i++) {
             for (var j = 0; j < $scope.folders[i].feeds.length; j++) {
@@ -160,18 +161,20 @@ darjeelingApp.filter('prettyDate', function () {
     };
 });
 
-//darjeelingApp.controller('SubscriptionsCtrl', function($scope, $modalInstance) {
-//	$scope.url = "";
-//	$scope.name = "";
-//	
-//	$scope.ok = function() {
-//		$modalInstance.close({name: $scope.name, url: $scope.url});
-//	};
-//
-//	$scope.cancel = function() {
-//		$modalInstance.dismiss('cancel');
-//	};
-//});
+function SubscriptionController($scope, $mdDialog, folders) {
+    $scope.folders = folders;
+    $scope.hide = function () {
+        $mdDialog.hide();
+    };
+    $scope.cancel = function () {
+        $mdDialog.cancel();
+    };
+    $scope.subscribe = function (form) {
+        if (form.$valid) {
+            $mdDialog.hide({name: $scope.name, url: $scope.url, folderId: $scope.folder.id});
+        }
+    };
+}
 
 setupHttp = function ($httpProvider) {
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
