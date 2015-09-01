@@ -50,19 +50,26 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         if ($scope.folders === undefined) {
             return; // we're not finished loading feeds
         }
-        var request;
+        var url;
+        var params = {
+    		unreadOnly: $scope.prefs.showUnreadOnly
+        }
 
         if (feedOrFolder === '-1') {
-            request = $http.get('/rest/feeds/items?unreadOnly=' + $scope.prefs.showUnreadOnly);
+            url = '/rest/feeds/items'; 
         } else if (feedOrFolder.feeds !== undefined) {
-            request = $http.get('/rest/feeds/itemsInFolder?folderId=' + feedOrFolder.id + '&unreadOnly=' + $scope.prefs.showUnreadOnly);
+        	url = '/rest/feeds/itemsInFolder';
+        	params.folderId = feedOrFolder.id;
         } else {
-            request = $http.get('/rest/feeds/items?feedId=' + feedOrFolder.id + '&unreadOnly=' + $scope.prefs.showUnreadOnly);
+        	url = '/rest/feeds/items';
+        	params.feedId = feedOrFolder.id;
         }
-        request.success(
+        
+        $http.get(url, {params: params}).success(
             function (data) {
                 $scope.items = data;
-            });
+            }
+        );
     };
 
     $scope.toggle = function (folder) {

@@ -41,7 +41,9 @@ import java.lang {
 import org.jooq {
     SQLDialect,
     RecordMapper,
-    Record
+    Record,
+    TableField,
+    SelectField
 }
 import org.jooq.impl {
     DSL
@@ -62,7 +64,9 @@ shared class FeedsDao() {
     modelMapper.configuration
         .addValueReader(RecordValueReader())
         .setSourceNameTokenizer(NameTokenizers.\iUNDERSCORE);
-    
+
+    {SelectField<out Object>*} selectedFieldsInItems = {items.id, items.title, items.description, items.url, items.publicationDate, items.feedId};
+
     shared Feed[] listFeeds() {
         return CeylonList(db.select().from(feeds).fetch().into(javaClass<Feed>())).sequence();
     }
@@ -90,7 +94,7 @@ shared class FeedsDao() {
     shared Item[] listItemsByFeed(Integer? feedId, Boolean unreadOnly) {
         value query = db.selectQuery();
         
-        query.addSelect(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId);
+        query.addSelect(*selectedFieldsInItems);
         query.addFrom(items);
         
         if (unreadOnly) {
@@ -107,14 +111,20 @@ shared class FeedsDao() {
     
     // TODO restrict by user
     shared Item[] listItemsByFolder(Integer folderId, Boolean unreadOnly) {
-        return CeylonList(
-            db.select(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId)
-                    .from(items)
-                    .join(subscriptions).on(subscriptions.feedId.eq(items.feedId))
-                    .where(subscriptions.folderId.eq(folderId))
-                    .limit(10)
-                    .fetch().into(javaClass<Item>())
-        ).sequence();
+        value query = db.selectQuery();
+
+        query.addSelect(*selectedFieldsInItems);
+        query.addFrom(items);
+        query.addJoin(subscriptions, subscriptions.feedId.eq(items.feedId));
+        
+        if (unreadOnly) {
+            query.addJoin(itemsToRead, itemsToRead.itemId.eq(items.id));
+        }
+        query.addConditions(subscriptions.folderId.eq(folderId));
+        
+        query.addLimit(10);
+        
+        return CeylonList(query.fetch().into(javaClass<Item>())).sequence();
     }
 
     shared Feed subscribe(String url, String title, Integer? folderId) {
