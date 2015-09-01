@@ -1,24 +1,20 @@
+import ceylon.interop.java {
+    javaClass,
+    CeylonList
+}
+import ceylon.time {
+    now
+}
+
 import com.github.bjansen.darjeeling {
     darjeelingDS
-}
-import org.jooq.impl {
-    DSL
-}
-import org.jooq {
-    SQLDialect,
-    RecordMapper,
-    Record,
-    Condition
 }
 import com.github.bjansen.darjeeling.model {
     Feed,
     Item,
     Folder
 }
-import ceylon.interop.java {
-    javaClass,
-    CeylonList
-}
+
 import gen.com.github.bjansen.darjeeling.tables {
     Feeds {
         feeds
@@ -31,23 +27,33 @@ import gen.com.github.bjansen.darjeeling.tables {
     },
     Subscriptions {
         subscriptions
+    },
+    ItemsToRead {
+        itemsToRead
     }
 }
+
 import java.lang {
     JInteger=Integer,
     JString=String
 }
+
+import org.jooq {
+    SQLDialect,
+    RecordMapper,
+    Record
+}
+import org.jooq.impl {
+    DSL
+}
 import org.modelmapper {
     ModelMapper
-}
-import org.modelmapper.jooq {
-    RecordValueReader
 }
 import org.modelmapper.convention {
     NameTokenizers
 }
-import ceylon.time {
-    now
+import org.modelmapper.jooq {
+    RecordValueReader
 }
 
 shared class FeedsDao() {
@@ -66,6 +72,7 @@ shared class FeedsDao() {
             .from(folders)
             .join(subscriptions).on(subscriptions.folderId.equal(folders.id))
             .join(feeds).on(subscriptions.feedId.equal(feeds.id))
+            .where()
             .fetch()
             .map(FolderRecordMapper());
         
@@ -80,20 +87,26 @@ shared class FeedsDao() {
     }
     
     // TODO restrict by user
-    shared Item[] listItemsByFeed(Integer? feedId) {
-        {Condition*} condition = if (exists feedId) then {items.feedId.eq(feedId)} else {};
+    shared Item[] listItemsByFeed(Integer? feedId, Boolean unreadOnly) {
+        value query = db.selectQuery();
         
-        return CeylonList(
-            db.select(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId)
-                .from(items)
-                .where(*condition)
-                .limit(10)
-                .fetch().into(javaClass<Item>())
-        ).sequence();
+        query.addSelect(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId);
+        query.addFrom(items);
+        
+        if (unreadOnly) {
+            query.addJoin(itemsToRead, itemsToRead.itemId.eq(items.id));
+        }
+        if (exists feedId) {
+            query.addConditions(items.feedId.eq(feedId));
+        }
+
+        query.addLimit(10);
+        
+        return CeylonList(query.fetch().into(javaClass<Item>())).sequence();
     }
     
     // TODO restrict by user
-    shared Item[] listItemsByFolder(Integer folderId) {
+    shared Item[] listItemsByFolder(Integer folderId, Boolean unreadOnly) {
         return CeylonList(
             db.select(items.id, items.title, items.description, items.url, items.publicationDate, items.feedId)
                     .from(items)

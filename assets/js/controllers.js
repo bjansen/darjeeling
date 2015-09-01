@@ -53,11 +53,11 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         var request;
 
         if (feedOrFolder === '-1') {
-            request = $http.get('/rest/feeds/items');
+            request = $http.get('/rest/feeds/items?unreadOnly=' + $scope.prefs.showUnreadOnly);
         } else if (feedOrFolder.feeds !== undefined) {
-            request = $http.get('/rest/feeds/itemsInFolder?folderId=' + feedOrFolder.id);
+            request = $http.get('/rest/feeds/itemsInFolder?folderId=' + feedOrFolder.id + '&unreadOnly=' + $scope.prefs.showUnreadOnly);
         } else {
-            request = $http.get('/rest/feeds/items?feedId=' + feedOrFolder.id);
+            request = $http.get('/rest/feeds/items?feedId=' + feedOrFolder.id + '&unreadOnly=' + $scope.prefs.showUnreadOnly);
         }
         request.success(
             function (data) {
@@ -171,7 +171,8 @@ function SubscriptionController($scope, $mdDialog, folders) {
     };
     $scope.subscribe = function (form) {
         if (form.$valid) {
-            $mdDialog.hide({name: $scope.name, url: $scope.url, folderId: $scope.folder.id});
+            var folderId = ($scope.folder === undefined) ? undefined : $scope.folder.id;
+            $mdDialog.hide({name: $scope.name, url: $scope.url, folderId: folderId});
         }
     };
 }
