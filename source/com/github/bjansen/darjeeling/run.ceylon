@@ -13,6 +13,13 @@ import ceylon.logging {
 import com.github.bjansen.gyokuro.json {
 	jsonSerializer
 }
+import ceylon.net.http.server {
+    Request,
+    Response
+}
+import ceylon.net.http.server.endpoints {
+    serveStaticFile
+}
 
 shared void run() {
 	defaultPriority = trace;
@@ -43,5 +50,15 @@ shared void run() {
 	value application = Application(8080, "/rest", `package com.github.bjansen.darjeeling.controller`);
 	
 	application.assetsPath = "assets";
+	application.filters = [authenticationFilter];
+	
 	application.run();
+}
+
+Boolean authenticationFilter(Request req, Response resp) {
+    if ((req.path == "/index.html" || req.path == "/") && req.session.get("userUid") is Null) {
+        serveStaticFile("assets/login.html")(req, resp, () => {});
+        return false;
+    }
+    return true;
 }

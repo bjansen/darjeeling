@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Darjeeling</title>
+
+<meta name="google-signin-scope" content="profile email">
+<meta name="google-signin-client_id"
+	content="183306700785-v7e3gko59f091dedpt8802hp9mii10tm.apps.googleusercontent.com">
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+
+<body>
+	<h1>Login</h1>
+	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+	<script>
+		function onSignIn(googleUser) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', '/rest/auth/login/google');
+			xhr.setRequestHeader('Content-Type',
+					'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+	            if (xhr.status == 200 && xhr.responseText == 'true') {
+	                document.location.reload(true);
+	            }
+			};
+			xhr.send('googleToken=' + googleUser.getAuthResponse().id_token);
+		};
+	</script>
+</body>
+</html>

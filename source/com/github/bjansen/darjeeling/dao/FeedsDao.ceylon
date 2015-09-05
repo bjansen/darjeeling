@@ -42,7 +42,6 @@ import org.jooq {
     SQLDialect,
     RecordMapper,
     Record,
-    TableField,
     SelectField
 }
 import org.jooq.impl {
@@ -71,12 +70,12 @@ shared class FeedsDao() {
         return CeylonList(db.select().from(feeds).fetch().into(javaClass<Feed>())).sequence();
     }
     
-    shared <Feed|Folder>[] listFoldersAndFeeds() {
+    shared <Feed|Folder>[] listFoldersAndFeeds(Integer userId) {
         value folderRecords = db.select()
             .from(folders)
             .join(subscriptions).on(subscriptions.folderId.equal(folders.id))
             .join(feeds).on(subscriptions.feedId.equal(feeds.id))
-            .where()
+            .where(subscriptions.userId.eq(userId))
             .fetch()
             .map(FolderRecordMapper());
         
@@ -90,8 +89,7 @@ shared class FeedsDao() {
                 .append(CeylonList(feedsRecords).sequence());
     }
     
-    // TODO restrict by user
-    shared Item[] listItemsByFeed(Integer? feedId, Boolean unreadOnly) {
+    shared Item[] listItemsByFeed(Integer userId, Integer? feedId, Boolean unreadOnly) {
         value query = db.selectQuery();
         
         query.addSelect(*selectedFieldsInItems);
@@ -103,14 +101,14 @@ shared class FeedsDao() {
         if (exists feedId) {
             query.addConditions(items.feedId.eq(feedId));
         }
+        query.addConditions(itemsToRead.userId.eq(userId));
 
         query.addLimit(10);
         
         return CeylonList(query.fetch().into(javaClass<Item>())).sequence();
     }
     
-    // TODO restrict by user
-    shared Item[] listItemsByFolder(Integer folderId, Boolean unreadOnly) {
+    shared Item[] listItemsByFolder(Integer userId, Integer folderId, Boolean unreadOnly) {
         value query = db.selectQuery();
 
         query.addSelect(*selectedFieldsInItems);
@@ -121,13 +119,14 @@ shared class FeedsDao() {
             query.addJoin(itemsToRead, itemsToRead.itemId.eq(items.id));
         }
         query.addConditions(subscriptions.folderId.eq(folderId));
+        query.addConditions(itemsToRead.userId.eq(userId));
         
         query.addLimit(10);
         
         return CeylonList(query.fetch().into(javaClass<Item>())).sequence();
     }
 
-    shared Feed subscribe(String url, String title, Integer? folderId) {
+    shared Feed subscribe(Integer userId, String url, String title, Integer? folderId) {
         Folder? folder = if (exists folderId)
                          then db.select().from(folders).where(folders.id.eq(folderId)).fetchOneInto(javaClass<Folder>())
                          else null;
@@ -148,8 +147,8 @@ shared class FeedsDao() {
             feed = record.into(javaClass<Feed>());
         }
         
-        db.insertInto(subscriptions, subscriptions.feedId, subscriptions.folderId, subscriptions.createdAt, subscriptions.updatedAt)
-               .values(feed.id, adjustedFolderId, _now, _now)
+        db.insertInto(subscriptions, subscriptions.userId, subscriptions.feedId, subscriptions.folderId, subscriptions.createdAt, subscriptions.updatedAt)
+               .values(userId, feed.id, adjustedFolderId, _now, _now)
                .execute();
         
         return feed;

@@ -5,7 +5,8 @@ import com.github.bjansen.darjeeling.model {
 }
 import com.github.bjansen.gyokuro {
 	route,
-	controller
+	controller,
+    session
 }
 import com.github.bjansen.darjeeling.dao {
 	FeedsDao
@@ -18,22 +19,22 @@ class FeedController() {
 	value feedsDao = FeedsDao();
 	
 	route ("all")
-	shared <Feed|Folder>[] listAll() {
-		return feedsDao.listFoldersAndFeeds();
+	shared <Feed|Folder>[] listAll(session Integer userId) {
+		return feedsDao.listFoldersAndFeeds(userId);
 	}
 	
 	route ("items")
-	shared Item[] listItems(Integer? feedId, Boolean unreadOnly) {
-		return feedsDao.listItemsByFeed(feedId, unreadOnly);
+	shared Item[] listItems(Integer? feedId, Boolean unreadOnly, session Integer userId) {
+		return feedsDao.listItemsByFeed(userId, feedId, unreadOnly);
 	}
 	
 	route ("itemsInFolder")
-	shared Item[] listItemsInFolder(Integer folderId, Boolean unreadOnly) {
-		return feedsDao.listItemsByFolder(folderId, unreadOnly);
+	shared Item[] listItemsInFolder(Integer folderId, Boolean unreadOnly, session Integer userId) {
+		return feedsDao.listItemsByFolder(userId, folderId, unreadOnly);
 	}
 	
 	route ("subscribe")
-	shared Feed subscribe(String url, String title, Integer? folderId) {
-		return feedsDao.subscribe(url, title, folderId);
+	shared Feed subscribe(String url, String title, Integer? folderId, session Integer userId) {
+		return feedsDao.subscribe(userId, url, title, folderId);
 	}
 }

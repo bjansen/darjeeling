@@ -105,3 +105,10 @@ h2.md-headline {
     margin-top: auto;
     margin-bottom: auto;
 }
+
+.md-button.md-fab.profile, .profile img {
+	line-height: 32px;
+	width: 32px;
+	height: 32px;
+	min-height: 32px;
+}

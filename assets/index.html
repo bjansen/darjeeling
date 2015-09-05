@@ -3,6 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id"
+        content="183306700785-v7e3gko59f091dedpt8802hp9mii10tm.apps.googleusercontent.com">
 	<title>Darjeeling</title>
 	<link rel="stylesheet" href="vendor/angular-material/angular-material.min.css">
 	<link rel="stylesheet" href="css/app.css">
@@ -32,6 +35,30 @@
             <md-button>
                 <md-icon ng-click="displayUnreadItems(selectedFeed)">refresh</md-icon>
             </md-button>
+            
+            <div class="g-signin2" ng-hide="true" data-onsuccess="onSignIn"></div>
+            <md-menu md-position-mode="target-right target" >
+		        <md-button aria-label="User options" class="md-fab profile" style="padding: 0" ng-click="$mdOpenMenu($event)">
+		          <img md-menu-origin ng-src="{{userProfile.imageUrl}}"/>
+		        </md-button>
+		        <md-menu-content width="4" >
+		          <md-list-item class="md-2-line">
+		              <img ng-src="{{userProfile.imageUrl}}" class="md-avatar" alt="{{userProfile.name}}" />
+		              <div class="md-list-item-text" layout="column">
+		                  <h3>{{userProfile.name}}</h3>
+		                  <h4>{{userProfile.email}}</h4>
+		              </div>
+		          </md-list-item>
+		          <md-menu-item>
+		            <md-button ng-click="signOut()">
+		                <div layout="row">
+		                  <p flex>Sign out</p>
+		                  <md-icon md-menu-align-target style="margin: auto 3px auto 0;">power_settings_new</md-icon>
+		                </div>
+		            </md-button>
+		          </md-menu-item>
+		        </md-menu-content>
+            </md-menu>
         </div>
         </md-toolbar>
 
@@ -43,7 +70,10 @@
 
             <md-content layout="column" flex class="md-padding">
                 <md-card ng-if="items.length === 0">
-                    No item to display!
+                    <span class="md-padding">
+                        <md-icon>announcement</md-icon>
+                        You're up to date with your feeds!
+                    </span>
                 </md-card>
                 <md-card ng-repeat="item in items" class="item" ng-init="currentFeed = getCurrentFeed(item)">
                     <div layout="row" layout-sm="column" layout-align-sm="start start">
@@ -103,5 +133,6 @@
     <script src="vendor/angular-aria/angular-aria.min.js"></script>
     <script src="vendor/angular-material/angular-material.min.js"></script>
     <script src="js/controllers.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>

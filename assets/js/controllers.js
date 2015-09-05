@@ -123,6 +123,29 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
 
         return undefined;
     };
+    
+    $scope.signOut = function() {
+    	$http.get('/rest/auth/logout').then(function (response) {
+    		if (response.data === true) {
+    			gapi.auth2.getAuthInstance().signOut();
+    			document.location.reload(true);
+    		}
+    	});
+    };
+    
+    function onSignIn(googleUser) {
+		var profile = googleUser.getBasicProfile();
+		$scope.$apply(function () {
+			$scope.userProfile = {
+				id: profile.getId(),
+				name: profile.getName(),
+				imageUrl: profile.getImageUrl(),
+				email: profile.getEmail()
+			};
+		});
+	}
+
+	window.onSignIn = onSignIn;
 });
 
 darjeelingApp.filter('removeSpam', function () {
