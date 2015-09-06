@@ -1,6 +1,10 @@
+import ceylon.collection {
+    HashMap
+}
 import ceylon.interop.java {
     javaClass,
-    CeylonList
+    CeylonList,
+    CeylonIterable
 }
 import ceylon.time {
     now
@@ -152,6 +156,17 @@ shared class FeedsDao() {
                .execute();
         
         return feed;
+    }
+    
+    shared Map<Integer, Integer> countUnreadItems(Integer userId) {
+        value result = db.select(items.feedId, DSL.count(itemsToRead.id))
+            .from(itemsToRead)
+            .join(items).on(items.id.eq(itemsToRead.itemId))
+            .where(itemsToRead.userId.eq(userId))
+            .groupBy(items.feedId)
+            .fetch().intoMap(items.feedId, DSL.count(itemsToRead.id));
+        
+        return HashMap<Integer, Integer> { entries = CeylonIterable(result.entrySet()).map((element) => element.key -> element.\ivalue.intValue()); };
     }
 }
 

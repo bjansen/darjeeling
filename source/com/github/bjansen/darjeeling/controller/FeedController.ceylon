@@ -37,4 +37,8 @@ class FeedController() {
 	shared Feed subscribe(String url, String title, Integer? folderId, session Integer userId) {
 		return feedsDao.subscribe(userId, url, title, folderId);
 	}
+	
+	route("countUnread")
+	shared Map<Integer, Integer> countUnreadItems(session Integer userId)
+	       => feedsDao.countUnreadItems(userId);
 }

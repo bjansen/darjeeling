@@ -21,7 +21,7 @@ darjeelingApp.directive('href', function () {
     };
 });
 
-darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDialog) {
+darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDialog, $interval) {
 
     setupHttp($http);
 
@@ -34,10 +34,57 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
                 return el['feeds'] === undefined;
             });
 
+            $interval(updateUnreadCount, 60*1000);
+            updateUnreadCount();
             $scope.displayUnreadItems($scope.selectedFeed);
         });
     };
 
+    updateUnreadCount = function() {
+    	$http.get('/rest/feeds/countUnread').success(function (data) {
+    		var totalUnread = 0;
+    		var folderUnread;
+    		
+    		for (var i = 0; i < $scope.folders.length; i++) {
+    			folderUnread = 0;
+    			
+    			for (var j = 0; j < $scope.folders[i].feeds.length; j++) {
+    				var feed = $scope.folders[i].feeds[j];
+    				if (data[feed.id] != undefined) {
+    					feed.unread = data[feed.id];
+    					folderUnread += data[feed.id];
+    				} else {
+    					feed.unread = 0;
+    				}
+    			}
+    			
+    			$scope.folders[i].unread = folderUnread;
+    			totalUnread += folderUnread;
+    		}
+    		
+			for (var j = 0; j < $scope.feeds.length; j++) {
+				var feed = $scope.feeds[j];
+				if (data[feed.id] != undefined) {
+					feed.unread = data[feed.id];
+					totalUnread += data[feed.id];
+				} else {
+					feed.unread = 0;
+				}
+			}
+			
+			$scope.totalUnread = totalUnread;
+			updateTitle();
+    	});
+    }
+    
+    updateTitle = function() {
+    	if ($scope.totalUnread > 0) {
+    		window.document.title = "(" + $scope.totalUnread + ") Darjeeling";
+    	} else {
+    		window.document.title = "Darjeeling";
+    	}
+    };
+    
     updateFeeds();
 
     $scope.items = [];
@@ -45,7 +92,6 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         showUnreadOnly: true
     };
 
-    // TODO use prefs.showUnreadOnly
     $scope.displayUnreadItems = function (feedOrFolder) {
         if ($scope.folders === undefined) {
             return; // we're not finished loading feeds

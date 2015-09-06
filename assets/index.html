@@ -23,11 +23,13 @@
 
             <span flex></span>
 
+            <!-- see https://github.com/angular/material/issues/3909 -->
+            <span ng-show="totalUnread > 0">({{totalUnread}})</span>
             <md-select name="selectedFeeds" ng-model="selectedFeed" aria-label="Feed to display" style="max-width: 50%"
                        ng-change="displayUnreadItems(selectedFeed)">
-                <md-option value="-1" selected>All feeds</md-option>
-                <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}}</md-option>
-                <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}}</md-option>
+                <md-option value="-1" selected>All feeds </md-option>
+                <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}} <span ng-show="folder.unread > 0">({{folder.unread}})</span></md-option>
+                <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}} <span ng-show="feed.unread > 0">({{feed.unread}})</span></md-option>
                 <md-option ng-repeat="feed in feeds" ng-value="feed">{{feed.name}}</md-option>
             </md-select>
 
