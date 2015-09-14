@@ -2,4 +2,11 @@
      <module module="org.modelmapper.extensions:modelmapper-jooq">
         <add module="org.jooq:jooq" shared="true" version="3.7.0-SNAPSHOT"/>
      </module>
+     <module module="com.rometools:rome-fetcher">
+        <add module="org.slf4j:slf4j-api" shared="true" version="1.7.7"/>
+     </module>
+     <module module="com.rometools:rome">
+        <add module="com.rometools:rome-utils" shared="true" version="1.6.0-SNAPSHOT"/>
+        <add module="com.github.bjansen.darjeeling" version="0.1"/>
+     </module>
 </overrides>

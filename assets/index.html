@@ -82,7 +82,7 @@
                         <h2 class="md-headline"><a href="{{item.url}}">{{item.title}}</a></h2>
                         <span flex></span>
                         <span style="color: #999;">
-                            <md-tooltip>{{item.publicationDate | date : 'medium'}}</md-tooltip>
+                            <md-tooltip>{{item.publicationDate | fullDate}}</md-tooltip>
                             {{item.publicationDate | prettyDate}}
                         </span>
                     </div>

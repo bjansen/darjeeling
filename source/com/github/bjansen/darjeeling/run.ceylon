@@ -20,6 +20,19 @@ import ceylon.net.http.server {
 import ceylon.net.http.server.endpoints {
     serveStaticFile
 }
+import java.util.concurrent {
+    Executors,
+    TimeUnit
+}
+import com.github.bjansen.darjeeling.task {
+    feedFetcherTask
+}
+import ceylon.time {
+    now
+}
+import ceylon.locale {
+    systemLocale
+}
 
 shared void run() {
 	defaultPriority = trace;
@@ -29,16 +42,15 @@ shared void run() {
 			value print = p<=info
 			then process.writeLine
 			else process.writeError;
-			print("[``system.milliseconds``] ``p.string`` ``m``");
+			print("[``systemLocale.formats.mediumFormatTime(now().dateTime())``] ``p.string`` ``m``");
 			if (exists e) {
+				print("\n");
 				printStackTrace(e, print);
 			}
 		}		
 	};
 
 	value mysqlDS = MysqlDataSource();
-	//darjeelingDS.dataSourceClassName = "com.mysql.jdbc.jdbc2.optional.MysqlDataSource";
-	//darjeelingDS.jdbcUrl = "jdbc:mysql://localhost:3306/feedzee2";
 	mysqlDS.databaseName = "feedzee2";
 	mysqlDS.user = "root";
 	mysqlDS.setPassword("");
@@ -51,6 +63,10 @@ shared void run() {
 	
 	application.assetsPath = "assets";
 	application.filters = [authenticationFilter];
+
+	value scheduler = Executors.newScheduledThreadPool(1);
+	feedFetcherTask.setup();
+	scheduler.scheduleWithFixedDelay(feedFetcherTask, 0, 1, TimeUnit.\iMINUTES);
 	
 	application.run();
 }

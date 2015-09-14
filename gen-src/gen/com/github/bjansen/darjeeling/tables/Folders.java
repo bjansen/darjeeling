@@ -4,10 +4,12 @@
 package gen.com.github.bjansen.darjeeling.tables;
 
 
+import ceylon.language.Boolean;
 import ceylon.language.Integer;
 import ceylon.language.String;
 import ceylon.time.DateTime;
 
+import com.github.bjansen.ceylon.jooqadapter.BooleanConverter;
 import com.github.bjansen.ceylon.jooqadapter.DateTimeConverter;
 import com.github.bjansen.ceylon.jooqadapter.IntegerConverter;
 import com.github.bjansen.ceylon.jooqadapter.StringConverter;
@@ -42,7 +44,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Folders extends TableImpl<FoldersRecord> {
 
-	private static final long serialVersionUID = 550467909;
+	private static final long serialVersionUID = 1320212969;
 
 	/**
 	 * The reference instance of <code>feedzee2.folders</code>
@@ -85,7 +87,7 @@ public class Folders extends TableImpl<FoldersRecord> {
 	/**
 	 * The column <code>feedzee2.folders.is_expanded</code>.
 	 */
-	public final TableField<FoldersRecord, Byte> isExpanded = createField("is_expanded", org.jooq.impl.SQLDataType.TINYINT, this, "");
+	public final TableField<FoldersRecord, Boolean> isExpanded = createField("is_expanded", org.jooq.impl.SQLDataType.TINYINT, this, "", new BooleanConverter());
 
 	/**
 	 * Create a <code>feedzee2.folders</code> table reference

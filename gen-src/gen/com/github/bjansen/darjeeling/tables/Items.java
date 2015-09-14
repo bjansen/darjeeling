@@ -4,10 +4,12 @@
 package gen.com.github.bjansen.darjeeling.tables;
 
 
+import ceylon.language.Boolean;
 import ceylon.language.Integer;
 import ceylon.language.String;
 import ceylon.time.DateTime;
 
+import com.github.bjansen.ceylon.jooqadapter.BooleanConverter;
 import com.github.bjansen.ceylon.jooqadapter.DateTimeConverter;
 import com.github.bjansen.ceylon.jooqadapter.IntegerConverter;
 import com.github.bjansen.ceylon.jooqadapter.StringConverter;
@@ -42,7 +44,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Items extends TableImpl<ItemsRecord> {
 
-	private static final long serialVersionUID = -765865434;
+	private static final long serialVersionUID = -2067944304;
 
 	/**
 	 * The reference instance of <code>feedzee2.items</code>
@@ -105,7 +107,7 @@ public class Items extends TableImpl<ItemsRecord> {
 	/**
 	 * The column <code>feedzee2.items.subscription_pushed</code>.
 	 */
-	public final TableField<ItemsRecord, Byte> subscriptionPushed = createField("subscription_pushed", org.jooq.impl.SQLDataType.TINYINT, this, "");
+	public final TableField<ItemsRecord, Boolean> subscriptionPushed = createField("subscription_pushed", org.jooq.impl.SQLDataType.TINYINT, this, "", new BooleanConverter());
 
 	/**
 	 * Create a <code>feedzee2.items</code> table reference

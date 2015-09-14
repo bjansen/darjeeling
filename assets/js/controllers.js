@@ -221,20 +221,30 @@ darjeelingApp.filter('prettyDate', function () {
     var msPerHour = 1000 * 60 * 60;
     var msPerDay = 1000 * 60 * 60 * 24;
 
+    function pluralize(qty, label) {
+    	return qty + label.replace("(s)", qty > 1 ? "s" : "");
+    }
+
     return function (rawDate) {
         var date = new Date(rawDate);
         var dateDiff = new Date() - date;
 
         if (dateDiff / msPerMinute < 60) {
-            return Math.floor(dateDiff / msPerMinute) + " minutes ago";
+            return pluralize(Math.floor(dateDiff / msPerMinute), " minute(s) ago");
         } else if (dateDiff / msPerHour < 24) {
-            return Math.floor(dateDiff / msPerHour) + " hours ago";
+            return pluralize(Math.floor(dateDiff / msPerHour), " hour(s) ago");
         } else if (dateDiff / msPerDay < 4) {
-            return Math.floor(dateDiff / msPerDay) + " days ago";
+            return pluralize(Math.floor(dateDiff / msPerDay), " day(s) ago");
         }
 
         return date.toDateString();
     };
+});
+
+darjeelingApp.filter('fullDate', function () {
+    return function (rawDate) {
+    	return new Date(rawDate).toString();
+    }
 });
 
 function SubscriptionController($scope, $mdDialog, folders) {

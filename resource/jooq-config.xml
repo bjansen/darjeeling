@@ -52,6 +52,11 @@
             <type>ceylon.language.Integer</type>
             <converter>com.github.bjansen.ceylon.jooqadapter.IntegerConverter</converter>
         </customType>
+        <customType>
+            <name>Boolean</name>
+            <type>ceylon.language.Boolean</type>
+            <converter>com.github.bjansen.ceylon.jooqadapter.BooleanConverter</converter>
+        </customType>
       </customTypes>
       
       <forcedTypes>
@@ -66,6 +71,10 @@
         <forcedType>
             <name>String</name>
             <types>(varchar|text)</types>
+        </forcedType>
+        <forcedType>
+            <name>Boolean</name>
+            <types>tinyint</types>
         </forcedType>
       </forcedTypes>
     </database>
