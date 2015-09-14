@@ -112,9 +112,12 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
                                  then toCeylonDateTime(feedDate) 
                                  else lastUpdate;
                 
+                value desc = if (!item.contents.empty) then item.contents.get(0).\ivalue
+                             else (item.description?.\ivalue else "<empty>");
+                
                 db.insertInto(items, items.feedId, items.title, items.description, items.publicationDate,
                         items.url, items.subscriptionPushed, items.createdAt, items.updatedAt)
-                    .values(feed.id, item.title, item.contents.get(0).\ivalue, itemDate,
+                    .values(feed.id, item.title, desc, itemDate,
                         item.link else "", false, lastUpdate, lastUpdate)
                     .execute();
             }
