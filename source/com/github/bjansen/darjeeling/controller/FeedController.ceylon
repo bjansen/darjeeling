@@ -41,4 +41,8 @@ class FeedController() {
 	route("countUnread")
 	shared Map<Integer, Integer> countUnreadItems(session Integer userId)
 	       => feedsDao.countUnreadItems(userId);
+	
+	route("markAsRead")
+	shared Boolean markItemAsRead(Integer itemId, session Integer userId)
+			=> feedsDao.markItemAsRead(itemId, userId) == 1;
 }

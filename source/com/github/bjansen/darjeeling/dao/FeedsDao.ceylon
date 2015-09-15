@@ -168,6 +168,13 @@ shared class FeedsDao() {
         
         return HashMap<Integer, Integer> { entries = CeylonIterable(result.entrySet()).map((element) => element.key -> element.\ivalue.intValue()); };
     }
+    
+    shared Integer markItemAsRead(Integer itemId, Integer userId) {
+        return db.deleteFrom(itemsToRead)
+            .where(itemsToRead.itemId.eq(itemId))
+            .and(itemsToRead.userId.eq(userId))
+            .execute();
+    }
 }
 
 class FolderRecordMapper() satisfies RecordMapper<Record, Folder> {

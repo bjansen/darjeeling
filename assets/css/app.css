@@ -112,3 +112,15 @@ h2.md-headline {
 	height: 32px;
 	min-height: 32px;
 }
+
+md-card:focus {
+	outline: none;
+}
+
+md-card {
+	border: 1px solid transparent;
+}
+
+md-card.selected {
+	border-color: rgba(0, 102, 255, 0.42);
+}

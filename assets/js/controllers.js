@@ -170,6 +170,20 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         return undefined;
     };
     
+    $scope.selectItem = function (item, feed) {
+    	for (var i = 0; i < $scope.items.length; i++) {
+    		var it = $scope.items[i];
+    		if (item.id == it.id) {
+    			it.selected = true;
+    			if (item.read !== true) {
+    				markItemAsRead(item, feed);
+    			}
+    		} else {
+    			it.selected = undefined;
+    		}
+    	}
+    };
+    
     $scope.signOut = function() {
     	$http.get('/rest/auth/logout').then(function (response) {
     		if (response.data === true) {
@@ -178,6 +192,48 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
     		}
     	});
     };
+    
+    function markItemAsRead(item, feed) {
+    	// TODO may not necessary if we are displaying all items (including those already read)
+    	
+        $http.post('/rest/feeds/markAsRead', {itemId: item.id})
+        .then(function () {
+            item.read = true;
+
+        	if (feed.unread > 0) {
+                feed.unread--;
+        	} else {
+        		console.log("oops, feed[" + feed.id + "].unread=" + feed.unread);
+        	}
+
+        	var parentFolder = findParentFolder(feed);
+        	if (parentFolder != null) {
+        		if (parentFolder.unread > 0) {
+        			parentFolder.unread--;
+        		} else {
+        			console.log("oops, folder[" + parentFolder.id + "].unread=" + parentFolder.unread);
+        		}
+        	}
+        	
+        	if ($scope.totalUnread > 0) {
+        		$scope.totalUnread--;	
+        	} else {
+        		console.log("oops, $scope.totalUnread=" + $scope.totalUnread);
+        	}
+        }, function () {
+            console.log("ko");
+        });
+    }
+    
+    function findParentFolder(feed) {
+        for (var i = 0; i < $scope.folders.length; i++) {
+            for (var j = 0; j < $scope.folders[i].feeds.length; j++) {
+            	if ($scope.folders[i].feeds[j].id == feed.id) {
+            		return $scope.folders[i];
+            	}
+            }
+        }
+    }
     
     function onSignIn(googleUser) {
 		var profile = googleUser.getBasicProfile();
