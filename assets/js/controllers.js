@@ -40,7 +40,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         });
     };
 
-    updateUnreadCount = function() {
+    var updateUnreadCount = function() {
     	$http.get('/rest/feeds/countUnread').success(function (data) {
     		var totalUnread = 0;
     		var folderUnread;
@@ -77,7 +77,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
     	});
     }
     
-    updateTitle = function() {
+    var updateTitle = function() {
     	if ($scope.totalUnread > 0) {
     		window.document.title = "(" + $scope.totalUnread + ") Darjeeling";
     	} else {
@@ -193,7 +193,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
     	});
     };
     
-    function markItemAsRead(item, feed) {
+    var markItemAsRead = function(item, feed) {
     	// TODO may not necessary if we are displaying all items (including those already read)
     	
         $http.post('/rest/feeds/markAsRead', {itemId: item.id})
@@ -225,7 +225,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         });
     }
     
-    function findParentFolder(feed) {
+    var findParentFolder = function(feed) {
         for (var i = 0; i < $scope.folders.length; i++) {
             for (var j = 0; j < $scope.folders[i].feeds.length; j++) {
             	if ($scope.folders[i].feeds[j].id == feed.id) {
@@ -235,7 +235,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         }
     }
     
-    function onSignIn(googleUser) {
+    var onSignIn = function(googleUser) {
 		var profile = googleUser.getBasicProfile();
 		$scope.$apply(function () {
 			$scope.userProfile = {
