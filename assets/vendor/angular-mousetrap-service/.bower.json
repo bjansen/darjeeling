@@ -1,0 +1,36 @@
+{
+  "name": "angular-mousetrap-service",
+  "version": "0.1.0",
+  "homepage": "https://github.com/the-darc/angular-mousetrap",
+  "authors": [
+    "darc <darc.tec@gmail.com>"
+  ],
+  "description": "AngularJS Service for dependency injection of mousetrap.js",
+  "main": "release/service.min.js",
+  "keywords": [
+    "mousetrap",
+    "angular",
+    "keyboard",
+    "shortcuts",
+    "events"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "devDependencies": {
+    "mousetrap": "~1.4.6"
+  },
+  "_release": "0.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.0",
+    "commit": "bccdf06862d5d54cf4c137e8d05b48985bd48c5c"
+  },
+  "_source": "git://github.com/the-darc/angular-mousetrap.git",
+  "_target": "~0.1.0",
+  "_originalSource": "angular-mousetrap-service",
+  "_direct": true
+}

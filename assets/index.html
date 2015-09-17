@@ -15,7 +15,8 @@
 
 <body layout="row" ng-controller="FeedsCtrl">
     <div layout="column" flex>
-        <md-toolbar layout="row">
+        <md-progress-linear md-mode="indeterminate" class="md-accent" style="position: fixed; z-index: 1" ng-show="loading"></md-progress-linear>
+        <md-toolbar layout="row" style="z-index: 2">
         <div class="md-toolbar-tools">
             <md-button ng-click="toggleSidenav('left')" class="md-icon-button">
                 <md-icon aria-label="Menu">menu</md-icon>
@@ -27,7 +28,7 @@
             <!-- see https://github.com/angular/material/issues/3909 -->
             <span ng-show="totalUnread > 0">({{totalUnread}})</span>
             <md-select name="selectedFeeds" ng-model="selectedFeed" aria-label="Feed to display" style="max-width: 50%"
-                       ng-change="displayUnreadItems(selectedFeed)">
+                       ng-change="displayUnreadItems(selectedFeed)" ng-cloak>
                 <md-option value="-1" selected>All feeds </md-option>
                 <md-option ng-repeat-start="folder in folders" ng-value="folder">{{folder.name}} <span ng-show="folder.unread > 0">({{folder.unread}})</span></md-option>
                 <md-option ng-repeat="feed in folder.feeds" ng-repeat-end ng-value="feed" class="selectFeed">{{feed.name}} <span ng-show="feed.unread > 0">({{feed.unread}})</span></md-option>
@@ -40,7 +41,7 @@
             </md-button>
             
             <div class="g-signin2" ng-hide="true" data-onsuccess="onSignIn"></div>
-            <md-menu md-position-mode="target-right target" >
+            <md-menu md-position-mode="target-right target">
 		        <md-button aria-label="User options" class="md-fab profile" style="padding: 0" ng-click="$mdOpenMenu($event)">
 		          <img md-menu-origin ng-src="{{userProfile.imageUrl}}"/>
 		        </md-button>
@@ -64,9 +65,11 @@
             </md-menu>
         </div>
         </md-toolbar>
+        <md-progress-linear md-mode="indeterminate" class="md-accent" ng-show="loading"></md-progress-linear>
 
         <section layout="row" flex="">
-		    <md-sidenav layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left">
+		    <md-sidenav layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2"
+		          md-component-id="left" md-swipe-left="toggleSidenav('left')">
 		        <md-button class="md-primary md-raised" ng-click="showSubscribePopup($event)">Subscribe</md-button>
 		        <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
 		    </md-sidenav>
@@ -79,7 +82,9 @@
                     </span>
                 </md-card>
                 <md-card ng-repeat="item in items" ng-class="{item: true, selected: item.selected}"
-                        ng-init="currentFeed = getCurrentFeed(item)" ng-click="selectItem(item, currentFeed)">
+                        ng-init="currentFeed = getCurrentFeed(item)" ng-click="selectItem(item, currentFeed)"
+                        scroll-if="item.selected" ng-cloak
+                        md-swipe-right="selectPreviousItem()" md-swipe-left="selectNextItem()" >
                     <div layout="row" layout-sm="column" layout-align-sm="start start">
                         <h2 class="md-headline"><a href="{{item.url}}">{{item.title}}</a></h2>
                         <span flex></span>
@@ -136,6 +141,7 @@
     <script src="vendor/angular-animate/angular-animate.min.js"></script>
     <script src="vendor/angular-aria/angular-aria.min.js"></script>
     <script src="vendor/angular-material/angular-material.min.js"></script>
+    <script src="vendor/angular-mousetrap-service/release/angular-mousetrap-service.min.js"></script>
     <script src="js/controllers.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>

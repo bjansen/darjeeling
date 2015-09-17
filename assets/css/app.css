@@ -124,3 +124,8 @@ md-card {
 md-card.selected {
 	border-color: rgba(0, 102, 255, 0.42);
 }
+
+md-card img {
+    max-width: 100%;
+    height: auto;
+}

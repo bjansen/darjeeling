@@ -1,4 +1,4 @@
-var darjeelingApp = angular.module('darjeelingApp', ['ngMaterial']);
+var darjeelingApp = angular.module('darjeelingApp', ['ngMaterial', 'angular-mousetrap']);
 
 darjeelingApp.config(function ($mdThemingProvider) {
     $mdThemingProvider.theme('default')
@@ -21,7 +21,7 @@ darjeelingApp.directive('href', function () {
     };
 });
 
-darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDialog, $interval) {
+darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDialog, $interval, Mousetrap) {
 
     setupHttp($http);
 
@@ -41,6 +41,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
     };
 
     var updateUnreadCount = function() {
+    	$scope.loading = true;
     	$http.get('/rest/feeds/countUnread').success(function (data) {
     		var totalUnread = 0;
     		var folderUnread;
@@ -74,6 +75,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
 			
 			$scope.totalUnread = totalUnread;
 			updateTitle();
+			$scope.loading = false;
     	});
     }
     
@@ -92,7 +94,7 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         showUnreadOnly: true
     };
 
-    $scope.displayUnreadItems = function (feedOrFolder) {
+    $scope.displayUnreadItems = function (feedOrFolder, selectFirst) {
         if ($scope.folders === undefined) {
             return; // we're not finished loading feeds
         }
@@ -111,9 +113,15 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
         	params.feedId = feedOrFolder.id;
         }
         
+        $scope.loading = true;
         $http.get(url, {params: params}).success(
             function (data) {
                 $scope.items = data;
+                
+                if (selectFirst && $scope.items.length > 0) {
+                	$scope.selectItem($scope.items[0]);
+                }
+                $scope.loading = false;
             }
         );
     };
@@ -171,6 +179,9 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
     };
     
     $scope.selectItem = function (item, feed) {
+    	if (feed === undefined) {
+    		feed = $scope.getCurrentFeed(item);
+    	}
     	for (var i = 0; i < $scope.items.length; i++) {
     		var it = $scope.items[i];
     		if (item.id == it.id) {
@@ -248,6 +259,94 @@ darjeelingApp.controller('FeedsCtrl', function ($scope, $http, $mdSidenav, $mdDi
 	}
 
 	window.onSignIn = onSignIn;
+	
+	Mousetrap.bind('j', function() {
+		$scope.$apply($scope.selectNextItem);
+	});
+	
+	$scope.selectNextItem = function() {
+		var selectedItem;
+		var selectedIndex;
+		
+		for (var i = 0; i < $scope.items.length; i++) {
+			var it = $scope.items[i];
+			
+			if (it.selected === true) {
+				selectedItem = it;
+				selectedIndex = i;
+				break;
+			}
+		}
+		
+		if (selectedItem) {
+			if (selectedIndex < $scope.items.length - 1) {
+				$scope.selectItem($scope.items[selectedIndex + 1]);
+			} else {
+				$scope.displayUnreadItems($scope.selectedFeed, true);
+			}
+		} else if ($scope.items.length > 0) {
+			$scope.selectItem($scope.items[0]);
+		}
+	};
+	
+	Mousetrap.bind('k', function() {
+		$scope.$apply($scope.selectPreviousItem);
+	});
+
+	$scope.selectPreviousItem = function() {
+		var selectedItem;
+		var selectedIndex;
+		
+		for (var i = 0; i < $scope.items.length; i++) {
+			var it = $scope.items[i];
+			
+			if (it.selected === true) {
+				selectedItem = it;
+				selectedIndex = i;
+				break;
+			}
+		}
+		
+		if (selectedItem) {
+			if (selectedIndex > 0) {
+				$scope.selectItem($scope.items[selectedIndex - 1]);
+			}
+		}
+	};
+	
+	Mousetrap.bind('r', updateFeeds);
+	
+	// taken from https://github.com/jquery/jquery/blob/master/src/offset.js
+	$scope.offset = function(elem) {
+		var docElem, win, rect, doc;	
+		if ( !elem ) {
+			return;
+		}
+	
+		// Support: IE<=11+
+		// Running getBoundingClientRect on a
+		// disconnected node in IE throws an error
+		if ( !elem.getClientRects().length ) {
+			return { top: 0, left: 0 };
+		}
+	
+		rect = elem.getBoundingClientRect();
+	
+		// Make sure element is not hidden (display: none)
+		if ( rect.width || rect.height ) {
+			doc = elem.ownerDocument;
+			win = window;
+			docElem = doc.documentElement;
+	
+			return {
+				top: rect.top + win.pageYOffset - docElem.clientTop,
+				left: rect.left + win.pageXOffset - docElem.clientLeft
+			};
+		}
+	
+		// Return zeros for disconnected and hidden elements (gh-2310)
+		return rect;
+	}
 });
 
 darjeelingApp.filter('removeSpam', function () {
@@ -255,6 +354,17 @@ darjeelingApp.filter('removeSpam', function () {
         var thingsToRemove = [];
         var doc = document.implementation.createHTMLDocument("");
         doc.documentElement.innerHTML = string;
+
+        var qcRss = doc.getElementsByTagName("map");
+        for (var i = 0; i < qcRss.length; i++) {
+        	var node = qcRss[i];
+        	if (node.name.startsWith("admap")) {
+                thingsToRemove = thingsToRemove.concat(node.parentNode);
+                if (node.parentNode.nextSibling.tagName == "TABLE") {
+                	thingsToRemove = thingsToRemove.concat(node.parentNode.nextSibling);
+        		}
+        	}
+        }
 
         thingsToRemove = thingsToRemove.concat([].slice.call(doc.getElementsByClassName('feedflare')));
 
@@ -301,6 +411,16 @@ darjeelingApp.filter('fullDate', function () {
     return function (rawDate) {
     	return new Date(rawDate).toString();
     }
+});
+
+darjeelingApp.directive('scrollIf', function () {
+	return function (scope, element, attributes) {
+		scope.$watch(attributes.scrollIf, function(value) {
+		      if (value) {
+		    	  window.scrollTo(0, scope.offset(element[0]).top - 30);
+		      }
+		});
+	}
 });
 
 function SubscriptionController($scope, $mdDialog, folders) {
