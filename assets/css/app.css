@@ -45,10 +45,6 @@ html, body, .container-fluid, .row {
 	padding-left: 15px;
 }
 
-.md-sidenav-left {
-	position: relative;
-}
-
 @media (min-width: 600px) {
 	.md-padding {
 	    padding: 16px 50px;
@@ -62,6 +58,10 @@ html, body, .container-fluid, .row {
     
     md-card {
         margin: 8px 2px;
+    }
+    
+    .md-button {
+        min-width: 32px;
     }
 }
 

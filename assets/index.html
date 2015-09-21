@@ -68,8 +68,10 @@
         <md-progress-linear md-mode="indeterminate" class="md-accent" ng-show="loading"></md-progress-linear>
 
         <section layout="row" flex="">
-		    <md-sidenav layout="column" class="site-sidenav md-sidenav-left md-whiteframe-z2"
+		    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2"
 		          md-component-id="left" md-swipe-left="toggleSidenav('left')">
+	            <md-toolbar layout="row">
+	            </md-toolbar>
 		        <md-button class="md-primary md-raised" ng-click="showSubscribePopup($event)">Subscribe</md-button>
 		        <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
 		    </md-sidenav>
@@ -99,7 +101,7 @@
             </md-content>
         </section>
     </div>
-
+    
     <script type="text/ng-template" id="subscribePopup.html">
         <md-dialog aria-label="Subscribe to new feed">
             <form name="subscribeForm">
