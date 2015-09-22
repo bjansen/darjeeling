@@ -225,6 +225,13 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
 
         Mousetrap.bind('r', updateFeeds);
 
+        Mousetrap.bind('o', function() {
+            if (selectedItemIndex != -1) {
+                var item = $scope.items[selectedItemIndex];
+                window.open(item.url, '_blank');
+            }
+        });
+
         $scope.offset = AppHelpers.offset;
     }
 ]);
