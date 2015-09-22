@@ -1,6 +1,7 @@
 darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$mdDialog', '$interval', 'Mousetrap',
     function ($scope, customHttp, $mdSidenav, $mdDialog, $interval, Mousetrap) {
         var $http = customHttp.getHttp();
+        var selectedItemIndex = -1;
 
         var updateFeeds = function () {
             $http.get('/rest/feeds/all').success(function (data) {
@@ -144,6 +145,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                 var it = $scope.items[i];
                 if (item.id == it.id) {
                     it.selected = true;
+                    selectedItemIndex = i;
                     if (item.read !== true) {
                         markItemAsRead(item, feed);
                     }
@@ -200,22 +202,9 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
         });
 
         $scope.selectNextItem = function () {
-            var selectedItem;
-            var selectedIndex;
-
-            for (var i = 0; i < $scope.items.length; i++) {
-                var it = $scope.items[i];
-
-                if (it.selected === true) {
-                    selectedItem = it;
-                    selectedIndex = i;
-                    break;
-                }
-            }
-
-            if (selectedItem) {
-                if (selectedIndex < $scope.items.length - 1) {
-                    $scope.selectItem($scope.items[selectedIndex + 1]);
+            if (selectedItemIndex != -1) {
+                if (selectedItemIndex < $scope.items.length - 1) {
+                    $scope.selectItem($scope.items[selectedItemIndex + 1]);
                 } else {
                     $scope.displayUnreadItems($scope.selectedFeed, true);
                 }
@@ -229,23 +218,8 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
         });
 
         $scope.selectPreviousItem = function () {
-            var selectedItem;
-            var selectedIndex;
-
-            for (var i = 0; i < $scope.items.length; i++) {
-                var it = $scope.items[i];
-
-                if (it.selected === true) {
-                    selectedItem = it;
-                    selectedIndex = i;
-                    break;
-                }
-            }
-
-            if (selectedItem) {
-                if (selectedIndex > 0) {
-                    $scope.selectItem($scope.items[selectedIndex - 1]);
-                }
+            if (selectedItemIndex > 0) {
+                $scope.selectItem($scope.items[selectedItemIndex - 1]);
             }
         };
 
