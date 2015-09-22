@@ -101,11 +101,11 @@ shared class FeedsDao() {
         
         if (unreadOnly) {
             query.addJoin(itemsToRead, itemsToRead.itemId.eq(items.id));
+            query.addConditions(itemsToRead.userId.eq(userId));
         }
         if (exists feedId) {
             query.addConditions(items.feedId.eq(feedId));
         }
-        query.addConditions(itemsToRead.userId.eq(userId));
 
         query.addLimit(10);
         
@@ -121,9 +121,9 @@ shared class FeedsDao() {
         
         if (unreadOnly) {
             query.addJoin(itemsToRead, itemsToRead.itemId.eq(items.id));
+            query.addConditions(itemsToRead.userId.eq(userId));
         }
         query.addConditions(subscriptions.folderId.eq(folderId));
-        query.addConditions(itemsToRead.userId.eq(userId));
         
         query.addLimit(10);
         
