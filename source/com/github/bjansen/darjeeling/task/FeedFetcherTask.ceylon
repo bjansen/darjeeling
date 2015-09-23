@@ -62,6 +62,9 @@ import org.jooq {
 import org.jooq.impl {
     DSL
 }
+import ceylon.time.timezone {
+    timeZone
+}
 
 shared object feedFetcherTask satisfies Runnable & FetcherListener {
 
@@ -98,19 +101,20 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
         pushItemsToRead(allFeeds);
     }
 
-    DateTime toCeylonDateTime(Date d) {
-        return Instant(d.time).dateTime();
+    DateTime toCeylonDateTime(Date? d, DateTime defaultValue) {
+        if (exists d) {
+            return Instant(d.time).dateTime(timeZone.utc);
+        }
+        return defaultValue;
     }
     
     void insertItems(FeedsRecord feed, SyndFeed syndFeed, {SyndEntry*} entries) {
-        value lastUpdate = now().dateTime();
+        value lastUpdate = now().dateTime(timeZone.utc);
         
         if (entries.size > 0) {
             log.debug("Inserting ``entries.size`` new entries");
             for (item in entries) {
-                value itemDate = if (exists feedDate = item.publishedDate) 
-                                 then toCeylonDateTime(feedDate) 
-                                 else lastUpdate;
+                value itemDate = toCeylonDateTime(item.updatedDate else item.publishedDate else syndFeed.publishedDate, lastUpdate); 
                 
                 value desc = if (!item.contents.empty) then item.contents.get(0).\ivalue
                              else (item.description?.\ivalue else "<empty>");
@@ -141,7 +145,8 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
     
     shared actual void fetcherEvent(FetcherEvent fetcherEvent) {
         assert(exists feed = currentFeed);
-
+        value currentDate = now().dateTime(timeZone.utc);
+        
         if (fetcherEvent.eventType == "FEED_RETRIEVED") {
             log.debug("Fetched feed ``feed.name``");
             
@@ -150,7 +155,7 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
             if (syndFeed.entries.size() > 0) {
                 if (exists lastDate = feed.lastCheckedDate) {
                     function isNew(SyndEntry e) 
-                            => toCeylonDateTime(e.publishedDate else e.updatedDate else syndFeed.publishedDate) > lastDate;
+                            => toCeylonDateTime(e.updatedDate else e.publishedDate else syndFeed.publishedDate, currentDate) > lastDate;
                     
                     value newItems = CeylonList(syndFeed.entries).filter(isNew);
                     
@@ -161,12 +166,12 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
             }
         } else if (fetcherEvent.eventType == "FEED_UNCHANGED") {
             log.debug("Feed unchanged: ``feed.name``");
-            updateFeedInfo(feed, now().dateTime());
+            updateFeedInfo(feed, currentDate);
         }
     }
     
     void pushItemsToRead({FeedsRecord*} allFeeds) {
-        value currentDate = now().dateTime();
+        value currentDate = now().dateTime(timeZone.utc);
 
         value itemsToInsert = db.select(items.id, subscriptions.userId, DSL.val(currentDate, itemsToRead.createdAt),
             DSL.val(currentDate, itemsToRead.updatedAt))
