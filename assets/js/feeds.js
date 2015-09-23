@@ -182,6 +182,8 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                     } else {
                         console.log("oops, $scope.totalUnread=" + $scope.totalUnread);
                     }
+
+                    updateTitle();
                 }, function () {
                     console.log("ko");
                 });
