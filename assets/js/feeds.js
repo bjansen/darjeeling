@@ -2,6 +2,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
     function ($scope, customHttp, $mdSidenav, $mdDialog, $interval, Mousetrap) {
         var $http = customHttp.getHttp();
         var selectedItemIndex = -1;
+        var interval;
 
         var updateFeeds = function () {
             $http.get('/rest/feeds/all').success(function (data) {
@@ -12,7 +13,9 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                     return el['feeds'] === undefined;
                 });
 
-                $interval(updateUnreadCount, 60 * 1000);
+                if (interval === undefined) {
+                    interval = $interval(updateUnreadCount, 60 * 1000);
+                }
                 updateUnreadCount();
                 $scope.displayUnreadItems($scope.selectedFeed);
             });
