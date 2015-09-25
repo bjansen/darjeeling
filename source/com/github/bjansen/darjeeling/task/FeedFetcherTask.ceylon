@@ -1,6 +1,7 @@
 import ceylon.interop.java {
     CeylonIterable,
-    CeylonList
+    CeylonList,
+    javaString
 }
 import ceylon.logging {
     logger
@@ -53,7 +54,8 @@ import java.net {
     URL
 }
 import java.util {
-    Date
+    Date,
+    ArrayList
 }
 
 import org.jooq {
@@ -64,6 +66,9 @@ import org.jooq.impl {
 }
 import ceylon.time.timezone {
     timeZone
+}
+import com.rometools.modules.feedburner {
+    FeedBurner
 }
 
 shared object feedFetcherTask satisfies Runnable & FetcherListener {
@@ -122,12 +127,22 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
                 db.insertInto(items, items.feedId, items.title, items.description, items.publicationDate,
                         items.url, items.subscriptionPushed, items.createdAt, items.updatedAt)
                     .values(feed.id, item.title, desc, itemDate,
-                        item.link else "", false, lastUpdate, lastUpdate)
+                        getLink(item), false, lastUpdate, lastUpdate)
                     .execute();
             }
         }
         
         updateFeedInfo(feed, lastUpdate, true);
+    }
+    
+    String getLink(SyndEntry entry) {
+        for (mod in CeylonIterable(entry.modules)) {
+            if (is FeedBurner mod) {
+                return mod.origLink else entry.link else "";
+            }
+        }
+        
+        return entry.link else "";
     }
     
     void updateFeedInfo(FeedsRecord feed, DateTime lastUpdate, Boolean wasChanged = false) {
@@ -154,10 +169,22 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
 
             if (syndFeed.entries.size() > 0) {
                 if (exists lastDate = feed.lastCheckedDate) {
-                    function isNew(SyndEntry e) 
-                            => toCeylonDateTime(e.updatedDate else e.publishedDate else syndFeed.publishedDate, currentDate) > lastDate;
+                    value entries = CeylonList(syndFeed.entries);
                     
-                    value newItems = CeylonList(syndFeed.entries).filter(isNew);
+                    // see https://github.com/ceylon/ceylon-compiler/issues/2319
+                    value links = ArrayList<String>();
+                    entries.each((e) => links.add(getLink(e)));
+                    
+                    value existingUrls = db.select(items.url)
+                        .from(items)
+                        .where(items.feedId.eq(feed.id))
+                        .and(items.url.\iin(links))
+                        .fetchSet(items.url);
+                    
+                    function isNew(SyndEntry e) 
+                            => !existingUrls.contains(getLink(e));
+                    
+                    value newItems = entries.filter(isNew);
                     
                     insertItems(feed, syndFeed, newItems);
                 } else {
