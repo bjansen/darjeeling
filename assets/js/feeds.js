@@ -215,6 +215,8 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                 }
             } else if ($scope.items.length > 0) {
                 $scope.selectItem($scope.items[0]);
+            } else if ($scope.totalUnread > 0) {
+                $scope.displayUnreadItems($scope.selectedFeed, true);
             }
         };
 
