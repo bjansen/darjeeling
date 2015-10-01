@@ -97,7 +97,7 @@
                         </span>
                     </div>
                     <span class="md-subhead" style="color: #999; margin-bottom: 10px">from {{currentFeed.name}}</span>
-                    <div ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto"></div>
+                    <md-card-content ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto"></md-card-content>
                 </md-card>
             </md-content>
         </section>
