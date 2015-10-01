@@ -37,20 +37,22 @@ darjeelingApp.filter('prettyDate', function () {
     var msPerHour = 1000 * 60 * 60;
     var msPerDay = 1000 * 60 * 60 * 24;
 
-    function pluralize(qty, label) {
-        return qty + label.replace("(s)", qty > 1 ? "s" : "");
+    function format(qty, label) {
+    	var unit = label.replace("(s)", Math.abs(qty) > 1 ? "s" : "");
+    	
+        return qty<0 ? "in " + Math.abs(qty) + unit : qty + unit + " ago";
     }
 
     return function (rawDate) {
         var date = new Date(rawDate);
         var dateDiff = new Date() - date;
 
-        if (dateDiff / msPerMinute < 60) {
-            return pluralize(Math.floor(dateDiff / msPerMinute), " minute(s) ago");
-        } else if (dateDiff / msPerHour < 24) {
-            return pluralize(Math.floor(dateDiff / msPerHour), " hour(s) ago");
-        } else if (dateDiff / msPerDay < 4) {
-            return pluralize(Math.floor(dateDiff / msPerDay), " day(s) ago");
+        if (Math.abs(dateDiff / msPerMinute) < 60) {
+            return format(Math.floor(dateDiff / msPerMinute), " minute(s)");
+        } else if (Math.abs(dateDiff / msPerHour) < 24) {
+            return format(Math.floor(dateDiff / msPerHour), " hour(s)");
+        } else if (Math.abs(dateDiff / msPerDay) < 4) {
+            return format(Math.floor(dateDiff / msPerDay), " day(s)");
         }
 
         return date.toDateString();
