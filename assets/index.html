@@ -93,7 +93,7 @@
                         <span flex></span>
                         <span style="color: #999;">
                             <md-tooltip>{{item.publicationDate | fullDate}}</md-tooltip>
-                            {{item.publicationDate | prettyDate}}
+                            <span pretty-date="item.publicationDate"></span>
                         </span>
                     </div>
                     <span class="md-subhead" style="color: #999; margin-bottom: 10px">from {{currentFeed.name}}</span>
