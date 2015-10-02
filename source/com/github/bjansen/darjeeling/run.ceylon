@@ -72,9 +72,16 @@ shared void run() {
 }
 
 Boolean authenticationFilter(Request req, Response resp) {
-    if ((req.path == "/index.html" || req.path == "/") && req.session.get("userUid") is Null) {
-        serveStaticFile("assets/login.html")(req, resp, () => {});
-        return false;
-    }
+	if (req.session.get("userUid") is Null) {	
+	    if (req.path.startsWith("/rest")) {
+	        if (!req.path.startsWith("/rest/auth")) {
+	        	resp.responseStatus = 401;
+	        	resp.writeString("401 - Unauthorized. Please log in.");
+	        }
+	    } else {
+	        serveStaticFile("assets/login.html")(req, resp, () => {});
+	        return false;
+	    }
+	}
     return true;
 }

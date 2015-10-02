@@ -3,9 +3,35 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
         var $http = customHttp.getHttp();
         var selectedItemIndex = -1;
         var interval;
+        var serverDown = false;
 
+        var onError = function(response) {
+        	$scope.loading = false;
+        	
+        	if (response.status == 401) {
+        		window.location.reload();
+        	} else if (response.status == 0) {
+        		window.document.title = "(×_×) Darjeeling";
+        		serverDown = true;
+        		
+        	    $mdDialog.show(
+	    	      $mdDialog.alert()
+	    	        .parent(document.body)
+	    	        .clickOutsideToClose(false)
+	    	        .title('Awwww')
+	    	        .content('The server cannot be reached :-(')
+	    	        .ariaLabel('Server unreachable')
+	    	        .ok('Try again!')
+	    	    ).then(function() {
+	    	    	serverDown = false;
+	    	    	updateUnreadCount();
+	    	    });
+        	}
+        };
+        
         var updateFeeds = function () {
-            $http.get('/rest/feeds/all').success(function (data) {
+            $http.get('/rest/feeds/all').then(function (response) {
+            	var data = response.data
                 $scope.folders = data.filter(function (el) {
                     return el['feeds'] !== undefined;
                 });
@@ -18,14 +44,19 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                 }
                 updateUnreadCount();
                 $scope.displayUnreadItems($scope.selectedFeed);
-            });
+            }, onError);
         };
 
         $scope.$on('feedAdded', updateFeeds);
 
         var updateUnreadCount = function () {
+        	if (serverDown) {
+        		return;
+        	}
+        	
             $scope.loading = true;
-            $http.get('/rest/feeds/countUnread').success(function (data) {
+            $http.get('/rest/feeds/countUnread').then(function (response) {
+            	var data = response.data
                 var totalUnread = 0;
                 var folderUnread;
 
@@ -59,7 +90,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                 $scope.totalUnread = totalUnread;
                 updateTitle();
                 $scope.loading = false;
-            });
+            }, onError);
         };
 
         var updateTitle = function () {
@@ -97,15 +128,16 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
             }
 
             $scope.loading = true;
-            $http.get(url, {params: params}).success(
-                function (data) {
-                    $scope.items = data;
+            $http.get(url, {params: params}).then(
+                function (response) {
+                    $scope.items = response.data;
 
                     if (selectFirst && $scope.items.length > 0) {
                         $scope.selectItem($scope.items[0]);
                     }
                     $scope.loading = false;
-                }
+                },
+                onError
             );
         };
 
@@ -187,9 +219,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
                     }
 
                     updateTitle();
-                }, function () {
-                    console.log("ko");
-                });
+                }, onError);
         };
 
         var findParentFolder = function (feed) {
