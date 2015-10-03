@@ -13,11 +13,20 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body layout="row" ng-controller="FeedsCtrl">
-    <div layout="column" flex>
+<body ng-controller="FeedsCtrl">
+    <div layout="column" style="height: 100vh">
+        <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2"
+                    md-component-id="left" md-swipe-left="toggleSidenav('left')">
+            <md-toolbar layout="row">
+            </md-toolbar>
+            <md-button class="md-primary md-raised" ng-controller="SubscriptionsController"
+                       ng-click="showSubscribePopup($event, folders)">Subscribe</md-button>
+            <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
+        </md-sidenav>
+
         <md-progress-linear md-mode="indeterminate" class="md-accent" style="position: fixed; z-index: 1" ng-show="loading"></md-progress-linear>
-        <md-toolbar layout="row" style="z-index: 2" headroom tolerance='10' offset='64'>
-        <div class="md-toolbar-tools">
+        <md-toolbar layout="row" md-scroll-shrink>
+            <div class="md-toolbar-tools">
             <md-button ng-click="toggleSidenav('left')" class="md-icon-button">
                 <md-icon aria-label="Menu">menu</md-icon>
             </md-button>
@@ -39,7 +48,7 @@
             <md-button>
                 <md-icon ng-click="displayUnreadItems(selectedFeed)">refresh</md-icon>
             </md-button>
-            
+
             <div class="g-signin2" ng-hide="true" data-onsuccess="onSignIn"></div>
             <md-menu md-position-mode="target-right target" ng-controller="AuthCtrl">
 		        <md-button aria-label="User options" class="md-fab profile" style="padding: 0" ng-click="$mdOpenMenu($event)">
@@ -67,16 +76,7 @@
         </md-toolbar>
         <md-progress-linear md-mode="indeterminate" class="md-accent" ng-show="loading"></md-progress-linear>
 
-        <section layout="row" flex="">
-		    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2"
-		          md-component-id="left" md-swipe-left="toggleSidenav('left')">
-	            <md-toolbar layout="row">
-	            </md-toolbar>
-		        <md-button class="md-primary md-raised" ng-controller="SubscriptionsController"
-                           ng-click="showSubscribePopup($event, folders)">Subscribe</md-button>
-		        <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
-		    </md-sidenav>
-
+        <md-content flex>
             <md-content layout="column" flex class="md-padding">
                 <md-card ng-if="items.length === 0">
                     <span class="md-padding">
@@ -100,9 +100,9 @@
                     <md-card-content ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto"></md-card-content>
                 </md-card>
             </md-content>
-        </section>
+        </md-content>
     </div>
-    
+
     <script type="text/ng-template" id="subscribePopup.html">
         <md-dialog aria-label="Subscribe to new feed" ng-controller="SubscriptionsController">
             <form name="subscribeForm">
@@ -145,8 +145,6 @@
     <script src="vendor/angular-aria/angular-aria.min.js"></script>
     <script src="vendor/angular-material/angular-material.min.js"></script>
     <script src="vendor/angular-mousetrap-service/release/angular-mousetrap-service.min.js"></script>
-    <script src="vendor/headroom.js/dist/headroom.min.js"></script>
-    <script src="vendor/headroom.js/dist/angular.headroom.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/_directives.js"></script>
     <script src="js/_filters.js"></script>

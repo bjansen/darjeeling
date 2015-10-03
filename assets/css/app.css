@@ -2,6 +2,9 @@ html, body, .container-fluid, .row {
 	height: 100%;
 }
 
+body {
+	overflow-y: hidden;
+}
 .feeds, .items {
 	height: 100%;
 	overflow: auto;
@@ -47,13 +50,13 @@ html, body, .container-fluid, .row {
 
 @media (min-width: 600px) {
 	.md-padding {
-	    padding: 80px 50px 16px 50px;
+	    padding: 16px 50px;
 	}
 }
 
 @media (max-width: 600px) {
 	.md-padding {
-	    padding: 64px 0 0 0;
+	    padding: 0;
 	}
     
     md-card {
@@ -128,19 +131,4 @@ md-card.selected {
 md-card img {
     max-width: 100%;
     height: auto;
-}
-
-.headroom {
-    transition: transform 200ms linear;
-    position: fixed;
-    z-index: 10;
-    right: 0;
-    left: 0;
-    top: 0;
-}
-.headroom--pinned {
-    transform: translateY(0%);
-}
-.headroom--unpinned {
-    transform: translateY(-100%);
 }

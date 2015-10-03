@@ -32,7 +32,7 @@ AppHelpers.offset = function (elem) {
     return rect;
 };
 
-var darjeelingApp = angular.module('darjeelingApp', ['ngMaterial', 'angular-mousetrap', 'headroom']);
+var darjeelingApp = angular.module('darjeelingApp', ['ngMaterial', 'angular-mousetrap']);
 
 darjeelingApp.config(function ($mdThemingProvider) {
     $mdThemingProvider.theme('default')
