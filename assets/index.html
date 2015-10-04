@@ -25,7 +25,7 @@
         </md-sidenav>
 
         <md-progress-linear md-mode="indeterminate" class="md-accent" style="position: fixed; z-index: 1" ng-show="loading"></md-progress-linear>
-        <md-toolbar layout="row" md-scroll-shrink>
+        <md-toolbar class="md-whiteframe-z1" layout="row" md-scroll-shrink>
             <div class="md-toolbar-tools">
             <md-button ng-click="toggleSidenav('left')" class="md-icon-button">
                 <md-icon aria-label="Menu">menu</md-icon>
@@ -76,18 +76,18 @@
         </md-toolbar>
         <md-progress-linear md-mode="indeterminate" class="md-accent" ng-show="loading"></md-progress-linear>
 
-        <md-content flex>
-            <md-content layout="column" flex class="md-padding">
-                <md-card ng-if="items.length === 0">
-                    <span class="md-padding">
-                        <md-icon>announcement</md-icon>
-                        You're up to date with your feeds!
-                    </span>
-                </md-card>
-                <md-card ng-repeat="item in items" ng-class="{item: true, selected: item.selected}"
-                        ng-init="currentFeed = getCurrentFeed(item)" ng-click="selectItem(item, currentFeed)"
-                        scroll-if="item.selected" ng-cloak
-                        md-swipe-right="selectPreviousItem()" md-swipe-left="selectNextItem()" >
+        <md-content layout="column" flex class="md-padding">
+            <md-card ng-if="items.length === 0">
+                <span class="md-padding">
+                    <md-icon>announcement</md-icon>
+                    You're up to date with your feeds!
+                </span>
+            </md-card>
+            <md-card ng-repeat="item in items" ng-class="{item: true, selected: item.selected}"
+                    ng-init="currentFeed = getCurrentFeed(item)" ng-click="selectItem(item, currentFeed)"
+                    scroll-if="item.selected" ng-cloak
+                    md-swipe-right="selectPreviousItem()" md-swipe-left="selectNextItem()" >
+                <md-card-content>
                     <div layout="row" layout-sm="column" layout-align-sm="start start">
                         <h2 class="md-headline"><a href="{{item.url}}">{{item.title}}</a></h2>
                         <span flex></span>
@@ -97,9 +97,10 @@
                         </span>
                     </div>
                     <span class="md-subhead" style="color: #999; margin-bottom: 10px">from {{currentFeed.name}}</span>
-                    <md-card-content ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto"></md-card-content>
-                </md-card>
-            </md-content>
+                    <div ng-bind-html="item.description | removeSpam | trust" style="overflow-x: auto; overflow-y: visible">
+                    </div>
+                </md-card-content>
+            </md-card>
         </md-content>
     </div>
 
@@ -143,7 +144,7 @@
     <script src="vendor/angular/angular.min.js"></script>
     <script src="vendor/angular-animate/angular-animate.min.js"></script>
     <script src="vendor/angular-aria/angular-aria.min.js"></script>
-    <script src="vendor/angular-material/angular-material.min.js"></script>
+    <script src="vendor/angular-material/angular-material.js"></script>
     <script src="vendor/angular-mousetrap-service/release/angular-mousetrap-service.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/_directives.js"></script>

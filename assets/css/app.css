@@ -132,3 +132,8 @@ md-card img {
     max-width: 100%;
     height: auto;
 }
+
+
+md-card md-card-content {
+	padding: 0;
+}
