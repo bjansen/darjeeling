@@ -1,6 +1,10 @@
-import com.github.bjansen.gyokuro { Application }
-import com.mysql.jdbc.jdbc2.optional {
-	MysqlDataSource
+import ceylon.file {
+	parsePath,
+	Nil,
+	File
+}
+import ceylon.locale {
+	systemLocale
 }
 import ceylon.logging {
 	addLogWriter,
@@ -10,63 +14,112 @@ import ceylon.logging {
 	defaultPriority,
 	trace
 }
+import ceylon.net.http.server {
+	Request,
+	Response
+}
+import ceylon.net.http.server.endpoints {
+	serveStaticFile
+}
+import ceylon.openshift {
+	openshift
+}
+import ceylon.time {
+	now
+}
+
+import com.github.bjansen.darjeeling.task {
+	feedFetcherTask
+}
+import com.github.bjansen.gyokuro {
+	Application
+}
 import com.github.bjansen.gyokuro.json {
 	jsonSerializer
 }
-import ceylon.net.http.server {
-    Request,
-    Response
+import com.mysql.jdbc.jdbc2.optional {
+	MysqlDataSource
 }
-import ceylon.net.http.server.endpoints {
-    serveStaticFile
-}
+
 import java.util.concurrent {
-    Executors,
-    TimeUnit
-}
-import com.github.bjansen.darjeeling.task {
-    feedFetcherTask
-}
-import ceylon.time {
-    now
-}
-import ceylon.locale {
-    systemLocale
+	Executors,
+	TimeUnit
 }
 
 shared void run() {
 	defaultPriority = trace;
+	
+	value resource = if (exists d = process.environmentVariableValue("OPENSHIFT_LOG_DIR"))
+	                then parsePath(d).childPath("darjeeling.log").resource
+	                else null;
+	value logFile = if (is Nil resource)
+	                then resource.createFile().Appender()
+	                else if (is File resource) then resource.Appender()
+	                else null;
 	
 	addLogWriter {
 		void log(Priority p, Category c, String m, Throwable? e) {
 			value print = p<=info
 			then process.writeLine
 			else process.writeError;
-			print("[``systemLocale.formats.mediumFormatTime(now().dateTime())``] ``p.string`` ``m``");
+			
+			value msg = "[``systemLocale.formats.mediumFormatTime(now().dateTime())``] ``p.string`` ``m``";
+			print(msg);
+			if (exists logFile) {
+				logFile.writeLine(msg);
+				logFile.flush();
+			}
 			if (exists e) {
 				print("\n");
 				printStackTrace(e, print);
+
+				if (exists logFile) {
+					logFile.writeLine("\n");
+				    printStackTrace(e, logFile.write);
+				    logFile.flush();
+				}
 			}
 		}		
 	};
 
 	value mysqlDS = MysqlDataSource();
 	mysqlDS.databaseName = "feedzee2";
-	mysqlDS.user = "root";
-	mysqlDS.setPassword("");
+	
+	if (openshift.running) {
+		value db = openshift.mysql;
+		mysqlDS.serverName = db.host;
+		mysqlDS.user = db.user;
+		mysqlDS.setPassword(db.password);
+	} else {
+		mysqlDS.serverName = "localhost";
+		mysqlDS.user = "root";
+		mysqlDS.setPassword("");
+	}
 
 	darjeelingDS.dataSource = mysqlDS; 
 
 	jsonSerializer.customSerializers = [dateTimeSerializer];
 
-	value application = Application(8080, "/rest", `package com.github.bjansen.darjeeling.controller`);
+    String address;
+    Integer port;
+    
+    if (openshift.running) {
+        address = openshift.ceylon.ip;
+        port = openshift.ceylon.port;
+    } else {
+        address = "0.0.0.0";
+        port = 8080;
+    }
+    
+	value application = Application(address, port,
+		  ["/rest", `package com.github.bjansen.darjeeling.controller`]);
 	
 	application.assetsPath = "assets";
 	application.filters = [authenticationFilter];
 
 	value scheduler = Executors.newScheduledThreadPool(1);
 	feedFetcherTask.setup();
-	scheduler.scheduleWithFixedDelay(feedFetcherTask, 0, 1, TimeUnit.\iMINUTES);
+	scheduler.scheduleWithFixedDelay(feedFetcherTask, 0, 2, TimeUnit.\iMINUTES);
 	
 	application.run();
 }
