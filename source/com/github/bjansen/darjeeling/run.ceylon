@@ -120,7 +120,7 @@ shared void run() {
 		application.assetsPath = "assets";
 	}
 
-	application.filters = [authenticationFilter];
+	application.filters = [authenticationFilter(application)];
 
 	value scheduler = Executors.newScheduledThreadPool(1);
 	feedFetcherTask.setup();
@@ -129,7 +129,7 @@ shared void run() {
 	application.run();
 }
 
-Boolean authenticationFilter(Request req, Response resp) {
+Boolean authenticationFilter(Application app)(Request req, Response resp) {
 	if (req.session.get("userUid") is Null) {	
 	    if (req.path.startsWith("/rest")) {
 	        if (!req.path.startsWith("/rest/auth")) {
@@ -137,7 +137,7 @@ Boolean authenticationFilter(Request req, Response resp) {
 	        	resp.writeString("401 - Unauthorized. Please log in.");
 	        }
 	    } else {
-	        serveStaticFile("assets/login.html")(req, resp, () => {});
+	        serveStaticFile(app.assetsPath + "/login.html")(req, resp, () => {});
 	        return false;
 	    }
 	}
