@@ -114,7 +114,12 @@ shared void run() {
 	value application = Application(address, port,
 		  ["/rest", `package com.github.bjansen.darjeeling.controller`]);
 	
-	application.assetsPath = "assets";
+	if (openshift.running) {
+		application.assetsPath = openshift.repository + "assets";
+	} else {
+		application.assetsPath = "assets";
+	}
+
 	application.filters = [authenticationFilter];
 
 	value scheduler = Executors.newScheduledThreadPool(1);
