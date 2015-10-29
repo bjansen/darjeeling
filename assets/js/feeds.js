@@ -31,7 +31,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
         
         var updateFeeds = function () {
             $http.get('/rest/feeds/all').then(function (response) {
-            	var data = response.data
+            	var data = response.data;
                 $scope.folders = data.filter(function (el) {
                     return el['feeds'] !== undefined;
                 });
@@ -56,7 +56,7 @@ darjeelingApp.controller('FeedsCtrl', ['$scope', 'customHttp', '$mdSidenav', '$m
         	
             $scope.loading = true;
             $http.get('/rest/feeds/countUnread').then(function (response) {
-            	var data = response.data
+            	var data = response.data;
                 var totalUnread = 0;
                 var folderUnread;
 

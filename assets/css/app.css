@@ -50,13 +50,13 @@ body {
 
 @media (min-width: 600px) {
 	.md-padding {
-	    padding: 16px 50px;
+	    padding: 16px 50px 32px 50px;
 	}
 }
 
 @media (max-width: 600px) {
 	.md-padding {
-	    padding: 0;
+	    padding: 5px 0 10px 0;
 	}
     
     md-card {
