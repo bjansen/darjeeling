@@ -1,6 +1,6 @@
 <overrides xmlns="http://www.ceylon-lang.org/xsd/overrides">
      <module module="org.modelmapper.extensions:modelmapper-jooq">
-        <add module="org.jooq:jooq" shared="true" version="3.7.0-SNAPSHOT"/>
+        <add module="org.jooq:jooq" shared="true" version="3.7.0"/>
      </module>
      <module module="com.rometools:rome-fetcher">
         <add module="org.slf4j:slf4j-api" shared="true" version="1.7.7"/>

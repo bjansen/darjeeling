@@ -14,11 +14,11 @@ module com.github.bjansen.darjeeling "0.1" {
 	import java.base "8";
 	import java.jdbc "8";
 	import javax.annotation "8";
-	import ceylon.interop.java "1.1.1";
+	import ceylon.interop.java "1.2.0";
 	
-	import ceylon.net "1.1.1";
-	import ceylon.logging "1.1.1";
-	import ceylon.locale "1.1.1";
+	import ceylon.net "1.2.0";
+	import ceylon.logging "1.2.0";
+	import ceylon.locale "1.2.0";
 	
 	import gen.com.github.bjansen.darjeeling "0.1";
 	import com.github.bjansen.gyokuro "0.1";
