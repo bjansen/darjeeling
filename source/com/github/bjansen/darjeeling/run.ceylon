@@ -115,7 +115,7 @@ shared void run() {
 		  ["/rest", `package com.github.bjansen.darjeeling.controller`]);
 	
 	if (openshift.running) {
-		application.assetsPath = openshift.repository + "assets";
+		application.assetsPath = openshift.repository + "/assets";
 	} else {
 		application.assetsPath = "assets";
 	}
