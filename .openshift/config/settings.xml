@@ -1,0 +1,22 @@
+<settings>
+	<localRepository>{LOCAL_REPO}</localRepository>
+
+	<profiles>
+		<profile>
+			<id>myrepo</id>
+
+			<repositories>
+				<repository>
+					<id>github</id>
+					<name>Github repo</name>
+					<url>http://bjansen.github.io/mvn-deps</url>
+					<layout>default</layout>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+	
+	<activeProfiles>
+		<activeProfile>myrepo</activeProfile>
+	</activeProfiles>
+</settings>
