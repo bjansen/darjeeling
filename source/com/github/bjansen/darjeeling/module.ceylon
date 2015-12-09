@@ -5,10 +5,10 @@ module com.github.bjansen.darjeeling "0.1" {
 	import "org.modelmapper:modelmapper" "0.7.4";
 	import "org.modelmapper.extensions:modelmapper-jooq" "0.7.4";
 
-	import "com.rometools:rome-fetcher" "1.6.0-SNAPSHOT";
-	import "com.rometools:rome" "1.6.0-SNAPSHOT";
-	import "com.rometools:rome-utils" "1.6.0-SNAPSHOT";
-	import "com.rometools:rome-modules" "1.6.0-SNAPSHOT";
+	import "com.rometools:rome-fetcher" "1.6.0.20151209";
+	import "com.rometools:rome" "1.6.0.20151209";
+	import "com.rometools:rome-utils" "1.6.0.20151209";
+	import "com.rometools:rome-modules" "1.6.0.20151209";
 	import "org.jdom:jdom2" "2.0.5";
 
 	import java.base "8";

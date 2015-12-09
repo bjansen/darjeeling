@@ -3,14 +3,14 @@
         <add module="org.jooq:jooq" shared="true" version="3.7.0"/>
      </module>
      <module module="com.rometools:rome-fetcher">
-        <add module="org.slf4j:slf4j-api" shared="true" version="1.7.7"/>
+        <add module="org.slf4j:slf4j-api" shared="true" version="1.7.10"/>
      </module>
      <module module="com.rometools:rome-modules">
-        <add module="org.slf4j:slf4j-api" shared="true" version="1.7.7"/>
+        <add module="org.slf4j:slf4j-api" shared="true" version="1.7.10"/>
      </module>
      <module module="com.rometools:rome">
-        <add module="com.rometools:rome-utils" shared="true" version="1.6.0-SNAPSHOT"/>
-        <add module="com.rometools:rome-modules" shared="true" version="1.6.0-SNAPSHOT"/>
+        <add module="com.rometools:rome-utils" shared="true" version="1.6.0.20151209"/>
+        <add module="com.rometools:rome-modules" shared="true" version="1.6.0.20151209"/>
         <add module="org.jdom:jdom2" shared="true" version="2.0.5"/>
         <add module="com.github.bjansen.darjeeling" version="0.1"/>
      </module>
