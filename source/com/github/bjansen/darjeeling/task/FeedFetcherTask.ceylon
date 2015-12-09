@@ -1,7 +1,6 @@
 import ceylon.interop.java {
     CeylonIterable,
-    CeylonList,
-    javaString
+    CeylonList
 }
 import ceylon.logging {
     logger
@@ -10,6 +9,9 @@ import ceylon.time {
     DateTime,
     Instant,
     now
+}
+import ceylon.time.timezone {
+    timeZone
 }
 
 import com.github.bjansen.darjeeling {
@@ -22,6 +24,9 @@ import com.rometools.fetcher {
 import com.rometools.fetcher.impl {
     HashMapFeedInfoCache,
     HttpURLFeedFetcher
+}
+import com.rometools.modules.feedburner {
+    FeedBurner
 }
 import com.rometools.rome.feed.synd {
     SyndEntry,
@@ -63,12 +68,6 @@ import org.jooq {
 }
 import org.jooq.impl {
     DSL
-}
-import ceylon.time.timezone {
-    timeZone
-}
-import com.rometools.modules.feedburner {
-    FeedBurner
 }
 
 shared object feedFetcherTask satisfies Runnable & FetcherListener {
@@ -146,7 +145,7 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
     }
     
     void updateFeedInfo(FeedsRecord feed, DateTime lastUpdate, Boolean wasChanged = false) {
-        log.debug("Updating feed info");
+        log.info("Updating feed info");
         
         value query = db.updateQuery(feeds);
         query.addValue(feeds.lastCheckedDate, lastUpdate);

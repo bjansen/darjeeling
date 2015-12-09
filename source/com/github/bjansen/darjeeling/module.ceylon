@@ -21,5 +21,5 @@ module com.github.bjansen.darjeeling "0.1" {
 	import ceylon.openshift "1.2.0";
 	
 	import gen.com.github.bjansen.darjeeling "0.1";
-	import com.github.bjansen.gyokuro "0.1";
+	import com.github.bjansen.gyokuro "0.1.0";
 }

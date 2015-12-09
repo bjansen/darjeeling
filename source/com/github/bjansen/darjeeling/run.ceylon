@@ -12,7 +12,8 @@ import ceylon.logging {
 	info,
 	Category,
 	defaultPriority,
-	trace
+	trace,
+    warn
 }
 import ceylon.net.http.server {
 	Request,
@@ -47,7 +48,6 @@ import java.util.concurrent {
 }
 
 shared void run() {
-	defaultPriority = trace;
 	
 	value resource = if (exists d = process.environmentVariableValue("OPENSHIFT_LOG_DIR"))
 	                then parsePath(d).childPath("darjeeling.log").resource
@@ -86,11 +86,13 @@ shared void run() {
 	mysqlDS.databaseName = "feedzee2";
 	
 	if (openshift.running) {
+		defaultPriority = warn;
 		value db = openshift.mysql;
 		mysqlDS.serverName = db.host;
 		mysqlDS.user = db.user;
 		mysqlDS.setPassword(db.password);
 	} else {
+		defaultPriority = trace;
 		mysqlDS.serverName = "localhost";
 		mysqlDS.user = "root";
 		mysqlDS.setPassword("");
@@ -110,17 +112,14 @@ shared void run() {
         address = "0.0.0.0";
         port = 8080;
     }
-    
-	value application = Application(address, port,
-		  ["/rest", `package com.github.bjansen.darjeeling.controller`]);
-	
-	if (openshift.running) {
-		application.assetsPath = openshift.repository + "/assets";
-	} else {
-		application.assetsPath = "assets";
-	}
 
-	application.filters = [authenticationFilter(application)];
+    value assetsPath = 	if (openshift.running)
+		then openshift.repository + "/assets"
+    	else "assets";
+
+	value application = Application(address, port,
+		  ["/rest", `package com.github.bjansen.darjeeling.controller`],
+		  [assetsPath, ""], [authenticationFilter(assetsPath)]);
 
 	value scheduler = Executors.newScheduledThreadPool(1);
 	feedFetcherTask.setup();
@@ -129,7 +128,7 @@ shared void run() {
 	application.run();
 }
 
-Boolean authenticationFilter(Application app)(Request req, Response resp) {
+Boolean authenticationFilter(String assetsPath)(Request req, Response resp) {
 	if (req.session.get("userUid") is Null) {	
 	    if (req.path.startsWith("/rest")) {
 	        if (!req.path.startsWith("/rest/auth")) {
@@ -137,7 +136,7 @@ Boolean authenticationFilter(Application app)(Request req, Response resp) {
 	        	resp.writeString("401 - Unauthorized. Please log in.");
 	        }
 	    } else {
-	        serveStaticFile(app.assetsPath + "/login.html")(req, resp, () => {});
+	        serveStaticFile(assetsPath + "/login.html")(req, resp, () => {});
 	        return false;
 	    }
 	}
