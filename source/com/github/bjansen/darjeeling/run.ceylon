@@ -49,7 +49,9 @@ import java.util.concurrent {
 
 shared void run() {
 	
-	value resource = if (exists d = process.environmentVariableValue("OPENSHIFT_LOG_DIR"))
+	value isProd = process.environmentVariableValue("DARJEELING_LOG_DIR") exists;
+	
+	value resource = if (exists d = process.environmentVariableValue("DARJEELING_LOG_DIR"))
 	                then parsePath(d).childPath("darjeeling.log").resource
 	                else null;
 	value logFile = if (is Nil resource)
@@ -85,12 +87,11 @@ shared void run() {
 	value mysqlDS = MysqlDataSource();
 	mysqlDS.databaseName = "feedzee2";
 	
-	if (openshift.running) {
+	if (isProd) {
 		defaultPriority = warn;
-		value db = openshift.mysql;
-		mysqlDS.serverName = db.host;
-		mysqlDS.user = db.user;
-		mysqlDS.setPassword(db.password);
+		mysqlDS.serverName = env("DARJEELING_DB_HOST");
+		mysqlDS.user = env("DARJEELING_DB_USER");
+		mysqlDS.setPassword(env("DARJEELING_DB_PASSWORD"));
 	} else {
 		defaultPriority = trace;
 		mysqlDS.serverName = "localhost";
@@ -105,9 +106,9 @@ shared void run() {
     String address;
     Integer port;
     
-    if (openshift.running) {
-        address = openshift.ceylon.ip;
-        port = openshift.ceylon.port;
+    if (isProd) {
+        address = env("DARJEELING_APP_HOST");
+        port = parseInteger(env("DARJEELING_APP_PORT")) else -1;
     } else {
         address = "0.0.0.0";
         port = 8080;
@@ -126,6 +127,13 @@ shared void run() {
 	scheduler.scheduleWithFixedDelay(feedFetcherTask, 0, 2, TimeUnit.\iMINUTES);
 	
 	application.run();
+}
+
+String env(String name) {
+    if (exists val = process.environmentVariableValue(name)) {
+        return val;
+    }
+    throw Exception("Missing environment variable ``name``");
 }
 
 Boolean authenticationFilter(String assetsPath)(Request req, Response resp) {
