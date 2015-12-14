@@ -200,6 +200,7 @@ class FolderRecordMapper() satisfies RecordMapper<Record, Folder> {
         value feed = Feed();
         feed.id = r.getValue(feeds.id, javaClass<JInteger>())?.intValue() else -1;
         feed.name = r.getValue(feeds.name, javaClass<JString>())?.string else "";
+        feed.url = r.getValue(feeds.url, javaClass<JString>())?.string else "";
         folder.feeds = folder.feeds.withTrailing(feed);
         
         if (exists last = lastFolder, last == folder) {

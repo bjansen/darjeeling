@@ -31,16 +31,15 @@ class AuthenticationController() {
     shared Boolean loginUsingGoogleToken(String googleToken, Request req) {
         value response = parse(googleApiUrl + googleToken).get().execute();
 
-        if (response.status == 200, is JsonObject contents = jsonParse(response.contents)) {
-            log.debug("Received aud=``contents.getString("aud")``");
-            if (exists user = userDao.findUserByUid("google_oauth2", contents.getString("sub"))) {
-                log.debug("Found user. id=``user.id``");
-                
-                req.session.put("userId", user.id);
-                req.session.put("userUid", user.uid);
-                
-                return true;
-            }
+        if (response.status == 200,
+            is JsonObject contents = jsonParse(response.contents),
+            exists user = userDao.findUserByUid("google_oauth2", contents.getString("sub"))) {
+
+            log.info("Logging user ``user.id``");
+            req.session.put("userId", user.id);
+            req.session.put("userUid", user.uid);
+            
+            return true;
         }
         
         return false;

@@ -22,8 +22,8 @@ import com.rometools.fetcher {
     FetcherEvent
 }
 import com.rometools.fetcher.impl {
-    HashMapFeedInfoCache,
-    HttpURLFeedFetcher
+    HttpURLFeedFetcher,
+    HashMapFeedInfoCache
 }
 import com.rometools.modules.feedburner {
     FeedBurner
@@ -101,7 +101,7 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
         }
         currentFeed = null;
         
-        log.debug("Pushing items to read");
+        log.info("Pushing items to read");
         pushItemsToRead(allFeeds);
     }
 
@@ -145,7 +145,7 @@ shared object feedFetcherTask satisfies Runnable & FetcherListener {
     }
     
     void updateFeedInfo(FeedsRecord feed, DateTime lastUpdate, Boolean wasChanged = false) {
-        log.info("Updating feed info");
+        log.debug("Updating feed info");
         
         value query = db.updateQuery(feeds);
         query.addValue(feeds.lastCheckedDate, lastUpdate);
