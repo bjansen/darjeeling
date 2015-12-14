@@ -1,7 +1,7 @@
 
 [defaults]
 encoding=UTF-8
-offline=true
+offline=false
 flatclasspath=false
 autoexportmavendependencies=false
 overrides=overrides.xml

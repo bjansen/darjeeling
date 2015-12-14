@@ -3,3 +3,4 @@ modules
 classes
 .exploded
 config.old
+.idea/
