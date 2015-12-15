@@ -54,6 +54,7 @@ shared object subscriptionDao {
         
         db.update(subscriptions)
             .set(subscriptions.folderId, newSub.folder?.id)
+            .where(subscriptions.feedId.eq(newSub.feed.id))
             .execute();
     }
 }

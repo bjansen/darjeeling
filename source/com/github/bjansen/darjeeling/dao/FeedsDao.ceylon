@@ -75,6 +75,7 @@ shared class FeedsDao() {
     }
     
     shared <Feed|Folder>[] listFoldersAndFeeds(Integer userId) {
+        // TODO this doesn't select empty folders
         value folderRecords = db.select()
             .from(folders)
             .join(subscriptions).on(subscriptions.folderId.equal(folders.id))
