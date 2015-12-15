@@ -22,6 +22,8 @@
             <md-button class="md-primary md-raised" ng-controller="SubscriptionsController"
                        ng-click="showSubscribePopup($event, folders)">Subscribe</md-button>
             <md-switch ng-model="prefs.showUnreadOnly" aria-label="Show unread only">Show unread only</md-switch>
+            <md-button ng-controller="SubscriptionsController"
+                       ng-click="showEditSubscriptionPopup($event, folders, feeds)">Edit subscriptions</md-button>
         </md-sidenav>
 
         <md-progress-linear md-mode="indeterminate" class="md-accent" style="position: fixed; z-index: 1" ng-show="loading"></md-progress-linear>
@@ -109,7 +111,7 @@
             <form name="subscribeForm">
                 <md-toolbar>
                     <div class="md-toolbar-tools">
-                        <h2>Subscribe to new feed</h2>
+                        <h2>{{title}}</h2>
                         <span flex></span>
                         <md-button class="md-icon-button" ng-click="cancel()">
                             <md-icon aria-label="Close dialog">close</md-icon>
@@ -117,6 +119,13 @@
                     </div>
                 </md-toolbar>
                 <md-dialog-content style="max-width:800px;max-height:810px; ">
+                    <md-input-container ng-show="editMode">
+                        <md-icon>mode_edit</md-icon>
+                        <md-select ng-model="sub.feed" placeholder="Subscription" style="margin-left: 36px;"
+                            ng-change="updateValues(sub.feed)">
+                            <md-option ng-repeat="feed in feeds" ng-value="feed">{{feed.name}}</md-option>
+                        </md-select>
+                    </md-input-container>
                     <md-input-container>
                         <md-icon>folder</md-icon>
                         <md-select ng-model="sub.folder" placeholder="Parent folder" style="margin-left: 36px;">

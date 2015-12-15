@@ -1,15 +1,21 @@
 import com.github.bjansen.darjeeling.model {
 	Item,
 	Folder,
-    Feed
+    Feed,
+    Subscription
 }
 import com.github.bjansen.gyokuro {
 	route,
 	controller,
-    session
+    session,
+    halt
 }
 import com.github.bjansen.darjeeling.dao {
-	FeedsDao
+	FeedsDao,
+    subscriptionDao
+}
+import ceylon.net.http {
+    post
 }
 
 route ("feeds")
@@ -31,6 +37,31 @@ class FeedController() {
 	route ("itemsInFolder")
 	shared Item[] listItemsInFolder(Integer folderId, Boolean unreadOnly, session Integer userId) {
 		return feedsDao.listItemsByFolder(userId, folderId, unreadOnly);
+	}
+	
+	route("edit/:feedId", {post})
+	shared Feed editFeed(Integer feedId, String url, String title, Integer? folderId,
+	    session Integer userId) {
+		
+		value sub = subscriptionDao.findSubscription(userId, feedId)
+                else halt(404, "Subscription not found");
+		
+		sub.feed.url = url;
+		sub.feed.name = title;
+
+		Folder? folder;
+		if (exists folderId) {
+			value f = Folder();
+			f.id = folderId;
+			folder = f;
+		} else {
+			folder = null;
+		}
+		
+		value newSub = Subscription(sub.feed, folder, sub.user);
+		subscriptionDao.update(newSub);
+		
+		return newSub.feed;
 	}
 	
 	route ("subscribe")
