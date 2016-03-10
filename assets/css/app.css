@@ -74,10 +74,6 @@ md-card {
 	border: 1px solid transparent;
 }
 
-md-card div img {
-    width: auto;
-}
-
 a {
   color: #106CC8;
   text-decoration: none;
