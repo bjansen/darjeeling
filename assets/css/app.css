@@ -70,6 +70,8 @@ body {
 
 md-card {
 	padding: 0 10px 10px 10px;
+	flex: none;
+	border: 1px solid transparent;
 }
 
 md-card div img {
@@ -118,10 +120,6 @@ h2.md-headline {
 
 md-card:focus {
 	outline: none;
-}
-
-md-card {
-	border: 1px solid transparent;
 }
 
 md-card.selected {
