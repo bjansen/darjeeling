@@ -133,6 +133,9 @@ md-card img {
     height: auto;
 }
 
+.md-sidenav-left md-switch {
+    padding: 0 10px;
+}
 
 md-card md-card-content {
 	padding: 0;

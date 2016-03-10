@@ -118,17 +118,19 @@
                         </md-button>
                     </div>
                 </md-toolbar>
-                <md-dialog-content style="max-width:800px;max-height:810px; ">
+                <md-dialog-content style="max-width:800px;max-height:810px; padding: 15px" layout="column">
                     <md-input-container ng-show="editMode">
                         <md-icon>mode_edit</md-icon>
-                        <md-select ng-model="sub.feed" placeholder="Subscription" style="margin-left: 36px;"
+                        <label>Subscription</label>
+                        <md-select ng-model="sub.feed" style="overflow-x: hidden"
                             ng-change="updateValues(sub.feed)">
                             <md-option ng-repeat="feed in feeds" ng-value="feed">{{feed.name}}</md-option>
                         </md-select>
                     </md-input-container>
                     <md-input-container>
                         <md-icon>folder</md-icon>
-                        <md-select ng-model="sub.folder" placeholder="Parent folder" style="margin-left: 36px;">
+                        <label>Parent folder</label>
+                        <md-select ng-model="sub.folder">
                             <md-option ng-repeat="folder in folders" ng-value="folder">{{folder.name}}</md-option>
                         </md-select>
                     </md-input-container>
