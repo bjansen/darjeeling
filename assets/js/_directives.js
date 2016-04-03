@@ -2,7 +2,7 @@ darjeelingApp.directive('scrollIf', function () {
     return function (scope, element, attributes) {
         scope.$watch(attributes.scrollIf, function(value) {
             if (value) {
-                document.getElementsByTagName("md-content")[0].scrollTop = element[0].offsetTop - 15;
+                document.getElementById("main-content").scrollTop = element[0].offsetTop - 15;
             }
         });
     }
